@@ -5,6 +5,8 @@
     <feature name="http://developer.samsung.com/tizen/feature/network.accessory_protocol"/>
     <tizen:metadata key="AccessoryServicesLocation" value="res/xml/accessoryservices.xml"/>
     <tizen:privilege name="http://developer.samsung.com/privilege/accessoryprotocol"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/healthinfo"/>
+    <tizen:privilege name="http://tizen.org/privilege/healthinfo"/>
     <icon src="icon.png"/>
     <name>HelloAccessoryProvider</name>
     <tizen:setting background-support="enable" encryption="disable" hwkey-event="enable"/>
