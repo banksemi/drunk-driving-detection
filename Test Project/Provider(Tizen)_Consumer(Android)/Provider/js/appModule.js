@@ -28,13 +28,14 @@ define({
     name: 'app',
     requires: [
                'models/heartRate',
+               'models/motion',
                'core/event'
     ],
     def: function appInit(req) {
         'use strict';
 
         var lastData = {};
-        var event = req.core.event, heartRate = req.models.heartRate;
+        var event = req.core.event, heartRate = req.models.heartRate, motion=req.models.motion;
         console.log('app::def');
 
         /**
@@ -55,10 +56,12 @@ define({
             });
             
             setInterval(function(){
-            	console.log("HeartRate: "+ lastData.heartRate);
-            	console.log(SAAgent);
-            	SASocket.sendData(SAAgent.channelIds[0], "HeartRate: "+ lastData.heartRate);
-            },1000);
+            	var message = {};
+            	message.heartRate = lastData.heartRate;
+            	message.motion = motion.getData();
+            	message.timestamp = new Date().getTime();
+            	SASocket.sendData(SAAgent.channelIds[0], JSON.stringify(message));
+            }, 200);
         }
 
         return {
