@@ -33,6 +33,7 @@ define({
     def: function appInit(req) {
         'use strict';
 
+        var lastData = {};
         var event = req.core.event, heartRate = req.models.heartRate;
         console.log('app::def');
 
@@ -47,11 +48,17 @@ define({
             heartRate.start();
             function onHeartRateDataChange(info)
             {
-            	console.log("HeartRate: "+ info.detail.rate);
+            	lastData.heartRate = info.detail.rate;
             }
             event.on({
                 'models.heartRate.change': onHeartRateDataChange
             });
+            
+            setInterval(function(){
+            	console.log("HeartRate: "+ lastData.heartRate);
+            	console.log(SAAgent);
+            	SASocket.sendData(SAAgent.channelIds[0], "HeartRate: "+ lastData.heartRate);
+            },1000);
         }
 
         return {
