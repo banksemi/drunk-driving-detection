@@ -27,11 +27,14 @@
 define({
     name: 'app',
     requires: [
+               'models/heartRate',
+               'core/event'
     ],
-    def: function appInit() {
+    def: function appInit(req) {
         'use strict';
 
-        console.log('app::defsss');
+        var event = req.core.event, heartRate = req.models.heartRate;
+        console.log('app::def');
 
         /**
          * Initializes App module.
@@ -41,6 +44,14 @@ define({
          */
         function init() {
             console.log('app::init');
+            heartRate.start();
+            function onHeartRateDataChange(info)
+            {
+            	console.log("HeartRate: "+ info.detail.rate);
+            }
+            event.on({
+                'models.heartRate.change': onHeartRateDataChange
+            });
         }
 
         return {
