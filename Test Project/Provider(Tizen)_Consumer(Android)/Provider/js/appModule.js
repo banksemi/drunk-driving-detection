@@ -38,6 +38,13 @@ define({
         var event = req.core.event, heartRate = req.models.heartRate, motion=req.models.motion;
         console.log('app::def');
 
+        function HeartRateSensorStart()
+        {
+        	heartRate.start();
+            setTimeout(function (){
+                heartRate.stop();
+            }, 30000);
+        }
         /**
          * Initializes App module.
          *
@@ -46,7 +53,6 @@ define({
          */
         function init() {
             console.log('app::init');
-            heartRate.start();
             function onHeartRateDataChange(info)
             {
             	lastData.heartRate = info.detail.rate;
@@ -56,12 +62,18 @@ define({
             });
             
             setInterval(function(){
-            	var message = {};
-            	message.heartRate = lastData.heartRate;
-            	message.motion = motion.getData();
-            	message.timestamp = new Date().getTime();
-            	SASocket.sendData(SAAgent.channelIds[0], JSON.stringify(message));
+            	if (SASocket != null && SASocket.isConnected())
+        		{
+            		var message = {};
+                	message.heartRate = lastData.heartRate;
+                	message.motion = motion.getData();
+                	message.timestamp = new Date().getTime();
+                	SASocket.sendData(SAAgent.channelIds[0], JSON.stringify(message));
+        		}
             }, 200);
+
+        	HeartRateSensorStart();
+            setInterval(HeartRateSensorStart, 60000);
         }
 
         return {
