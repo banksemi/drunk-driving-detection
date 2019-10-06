@@ -122,8 +122,8 @@ public class ConsumerActivity extends Activity {
                 sb.append(json.get("timestamp") + ",");
                 sb.append(json.get("heartRate") + ",");
                 JSONObject motion = (JSONObject)json.get("motion");
-                JSONObject gyroscope = (JSONObject)motion.get("Gyroscope");
-                JSONObject gyroscopeRotation = (JSONObject)motion.get("GyroscopeRotation");
+                JSONObject gyroscope = (JSONObject)motion.get("gyroscope");
+                JSONObject gyroscopeRotation = (JSONObject)motion.get("gyroscopeRotation");
                 sb.append(gyroscope.get("x") + ",");
                 sb.append(gyroscope.get("y") + ",");
                 sb.append(gyroscope.get("z") + ",");
