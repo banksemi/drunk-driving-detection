@@ -42,6 +42,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 public class ConsumerActivity extends Activity {
     private static TextView mTextView;
     private static MessageAdapter mMessageAdapter;
@@ -105,10 +107,39 @@ public class ConsumerActivity extends Activity {
                 }
                 break;
             }
+            case R.id.buttonSave:
+                Save();
+                break;
             default:
         }
     }
+    private void Save()
+    {
+        StringBuilder sb = new StringBuilder("timestamp, heartRate, gyroscopeX, gyroscopeY, gyroscopeZ, gyroscopeRotationX, gyroscopeRotationY, gyroscopeRotationZ, light\n");
+        for (JSONObject json:ConsumerService.SensorData) {
+            try
+            {
+                sb.append(json.get("timestamp") + ",");
+                sb.append(json.get("heartRate") + ",");
+                JSONObject motion = (JSONObject)json.get("motion");
+                JSONObject gyroscope = (JSONObject)motion.get("Gyroscope");
+                JSONObject gyroscopeRotation = (JSONObject)motion.get("GyroscopeRotation");
+                sb.append(gyroscope.get("x") + ",");
+                sb.append(gyroscope.get("y") + ",");
+                sb.append(gyroscope.get("z") + ",");
+                sb.append(gyroscopeRotation.get("x") + ",");
+                sb.append(gyroscopeRotation.get("y") + ",");
+                sb.append(gyroscopeRotation.get("z") + ",");
+                sb.append(json.get("light") + "\n");
+            }
+            catch (Exception e)
+            {
 
+                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+        Toast.makeText(getApplicationContext(), sb, Toast.LENGTH_LONG).show();
+    }
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -125,7 +156,7 @@ public class ConsumerActivity extends Activity {
     };
 
     public static void addMessage(String data) {
-        mMessageAdapter.addMessage(new Message(data));
+        mMessageAdapter.addMessage(new Message(ConsumerService.SensorData.size() + "개 수신\n" + data));
     }
 
     public static void updateTextView(final String str) {

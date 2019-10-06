@@ -24,18 +24,24 @@
 package com.samsung.android.sdk.accessory.example.helloaccessory.consumer;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.JsonReader;
 import android.widget.Toast;
 import android.util.Log;
 
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.accessory.*;
 
+import org.json.JSONObject;
+
 public class ConsumerService extends SAAgent {
+    public static List<JSONObject> SensorData = new ArrayList<>();
     private static final String TAG = "HelloAccessory(C)";
     private static final Class<ServiceConnection> SASOCKET_CLASS = ServiceConnection.class;
     private final IBinder mBinder = new LocalBinder();
@@ -146,6 +152,10 @@ public class ConsumerService extends SAAgent {
         @Override
         public void onReceive(int channelId, byte[] data) {
             final String message = new String(data);
+            try
+            {
+                SensorData.add(new JSONObject(message));
+            } catch (Exception e) { }
             addMessage("Received: ", message);
         }
 
