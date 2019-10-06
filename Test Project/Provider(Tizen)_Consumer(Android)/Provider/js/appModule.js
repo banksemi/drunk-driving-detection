@@ -23,19 +23,20 @@
  * @requires {@link views/init}
  * @namespace app
  */
-
+var DEBUG_MODE = false;
 define({
     name: 'app',
     requires: [
                'models/heartRate',
                'models/motion',
+               'models/light',
                'core/event'
     ],
     def: function appInit(req) {
         'use strict';
 
         var lastData = {};
-        var event = req.core.event, heartRate = req.models.heartRate, motion=req.models.motion;
+        var event = req.core.event, heartRate = req.models.heartRate, motion=req.models.motion, light=req.models.light;
         console.log('app::def');
 
         function HeartRateSensorStart()
@@ -62,13 +63,17 @@ define({
             });
             
             setInterval(function(){
-            	if (SASocket != null && SASocket.isConnected())
+            	if (SASocket != null && SASocket.isConnected() || DEBUG_MODE)
         		{
             		var message = {};
                 	message.heartRate = lastData.heartRate;
                 	message.motion = motion.getData();
                 	message.timestamp = new Date().getTime();
-                	SASocket.sendData(SAAgent.channelIds[0], JSON.stringify(message));
+                	message.light = light.getData();
+                	if (DEBUG_MODE == true)
+                    	console.log(JSON.stringify(message));
+                	else
+                		SASocket.sendData(SAAgent.channelIds[0], JSON.stringify(message));
         		}
             }, 200);
 
