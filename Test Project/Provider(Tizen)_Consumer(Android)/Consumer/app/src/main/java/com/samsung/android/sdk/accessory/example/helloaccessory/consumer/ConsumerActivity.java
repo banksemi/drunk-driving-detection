@@ -23,6 +23,10 @@
 
 package com.samsung.android.sdk.accessory.example.helloaccessory.consumer;
 
+import java.io.DataOutputStream;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -117,13 +121,12 @@ public class ConsumerActivity extends Activity {
     {
         StringBuilder sb = new StringBuilder("timestamp, heartRate, gyroscopeX, gyroscopeY, gyroscopeZ, gyroscopeRotationX, gyroscopeRotationY, gyroscopeRotationZ, light\n");
         for (JSONObject json:ConsumerService.SensorData) {
-            try
-            {
+            try {
                 sb.append(json.get("timestamp") + ",");
                 sb.append(json.get("heartRate") + ",");
-                JSONObject motion = (JSONObject)json.get("motion");
-                JSONObject gyroscope = (JSONObject)motion.get("gyroscope");
-                JSONObject gyroscopeRotation = (JSONObject)motion.get("gyroscopeRotation");
+                JSONObject motion = (JSONObject) json.get("motion");
+                JSONObject gyroscope = (JSONObject) motion.get("gyroscope");
+                JSONObject gyroscopeRotation = (JSONObject) motion.get("gyroscopeRotation");
                 sb.append(gyroscope.get("x") + ",");
                 sb.append(gyroscope.get("y") + ",");
                 sb.append(gyroscope.get("z") + ",");
@@ -131,14 +134,54 @@ public class ConsumerActivity extends Activity {
                 sb.append(gyroscopeRotation.get("y") + ",");
                 sb.append(gyroscopeRotation.get("z") + ",");
                 sb.append(json.get("light") + "\n");
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
 
                 Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
-        Toast.makeText(getApplicationContext(), sb, Toast.LENGTH_LONG).show();
+        try {
+            String boundary = "*****";
+            String lineEnd = "\r\n";
+            String twoHyphens = "--";
+            String filename = "file.txt";
+            URL urlToRequest = new URL("https://easylab.kr/");
+            HttpURLConnection urlConnection =
+                    (HttpURLConnection) urlToRequest.openConnection();
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestProperty("Connection", "Keep-Alive");
+            urlConnection.setRequestProperty("ENCTYPE", "multipart/form-data");
+            urlConnection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+            urlConnection.setRequestProperty("uploaded_file", filename);
+
+            Toast.makeText(getApplicationContext(), "ASDF", Toast.LENGTH_LONG).show();
+            DataOutputStream dos = new DataOutputStream(urlConnection.getOutputStream());
+
+            Toast.makeText(getApplicationContext(), "ASDF", Toast.LENGTH_LONG).show();
+            dos.writeBytes(twoHyphens + boundary + lineEnd);
+            dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
+                    + filename + "\"" + lineEnd);
+
+            dos.writeBytes(lineEnd);
+            dos.writeBytes(sb.toString());
+            dos.writeBytes(lineEnd);
+            dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+            Toast.makeText(getApplicationContext(), "ASDF", Toast.LENGTH_LONG).show();
+
+            int serverResponseCode = urlConnection.getResponseCode();
+            String serverResponseMessage = urlConnection.getResponseMessage();
+
+            Toast.makeText(getApplicationContext(), serverResponseCode, Toast.LENGTH_LONG).show();
+            dos.flush();
+            dos.close();
+
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(getApplicationContext(), "에러" + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
