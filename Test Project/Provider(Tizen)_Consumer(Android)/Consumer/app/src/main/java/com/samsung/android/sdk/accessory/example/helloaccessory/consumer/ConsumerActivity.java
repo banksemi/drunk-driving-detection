@@ -33,6 +33,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -52,12 +53,18 @@ import android.widget.Toast;
 
 import org.json.JSONObject;
 
+import com.estimote.sdk.Beacon;
+import com.estimote.sdk.BeaconManager;
+import com.estimote.sdk.Region;
+import com.estimote.sdk.SystemRequirementsChecker;
+
 public class ConsumerActivity extends Activity {
     private static TextView mTextView;
     private static MessageAdapter mMessageAdapter;
     private boolean mIsBound = false;
     private ListView mMessageListView;
     private ConsumerService mConsumerService = null;
+    private BeaconManager beaconManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +76,45 @@ public class ConsumerActivity extends Activity {
         mMessageListView.setAdapter(mMessageAdapter);
         // Bind service
         mIsBound = bindService(new Intent(ConsumerActivity.this, ConsumerService.class), mConnection, Context.BIND_AUTO_CREATE);
+
+
+        beaconManager = new BeaconManager(getApplicationContext());
+        // Application 설치가 끝나면 Beacon Monitoring Service를 시작한다.
+        // Application을 종료하더라도 Service가 계속 실행된다.
+        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                Log.d("비콘", "시작");
+                beaconManager.startMonitoring(new Region(
+                                                "monitored region",
+                                                UUID.fromString("e686fdd0-c6f1-4a49-8048-4fe964dc2400"), 0, 0));
+            }
+        });
+
+
+
+        beaconManager.setRangingListener(new BeaconManager.RangingListener() {
+            @Override
+            public void onBeaconsDiscovered(Region region, List<Beacon> list) {
+                if (!list.isEmpty()) {
+                    for (Beacon b: list) {
+
+                        Log.d("비콘", "신호" + b.getRssi());
+                    }
+                }
+            }
+        });
+        // Android 단말이 Beacon 의 송신 범위에 들어가거나, 나왔을 때를 체크한다.
+        beaconManager.setMonitoringListener(new BeaconManager.MonitoringListener() {
+            @Override
+            public void onEnteredRegion(Region region, List<Beacon> list) {
+                Log.d("비콘", "연결" + list.get(0).getRssi());
+            }
+            @Override
+            public void onExitedRegion(Region region) {
+                Log.d("비콘", "나감");
+            }
+        });
     }
 
     @Override
