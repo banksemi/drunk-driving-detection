@@ -121,28 +121,9 @@ public class ConsumerActivity extends Activity {
             default:
         }
     }
-    private void Save()
-    {
-        final StringBuilder sb = new StringBuilder("timestamp, heartRate, gyroscopeX, gyroscopeY, gyroscopeZ, gyroscopeRotationX, gyroscopeRotationY, gyroscopeRotationZ, light\n");
-        for (JSONObject json:ConsumerService.SensorData) {
-            try {
-                sb.append(json.get("timestamp") + ",");
-                sb.append(json.get("heartRate") + ",");
-                JSONObject motion = (JSONObject) json.get("motion");
-                JSONObject gyroscope = (JSONObject) motion.get("gyroscope");
-                JSONObject gyroscopeRotation = (JSONObject) motion.get("gyroscopeRotation");
-                sb.append(gyroscope.get("x") + ",");
-                sb.append(gyroscope.get("y") + ",");
-                sb.append(gyroscope.get("z") + ",");
-                sb.append(gyroscopeRotation.get("x") + ",");
-                sb.append(gyroscopeRotation.get("y") + ",");
-                sb.append(gyroscopeRotation.get("z") + ",");
-                sb.append(json.get("light") + "\n");
-            } catch (Exception e) {
 
-                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }
+    private void ServerUpload(final String type, final String data)
+    {
         new Thread() {
             @Override
             public void run() {
@@ -152,7 +133,7 @@ public class ConsumerActivity extends Activity {
                     String lineEnd = "\r\n";
                     String twoHyphens = "--";
                     String filename = "file.txt";
-                    URL urlToRequest = new URL("https://api.easyrobot.co.kr/Test.php");
+                    URL urlToRequest = new URL("https://api.easyrobot.co.kr/Test.php?" + "type=" + type);
                     HttpURLConnection urlConnection =
                             (HttpURLConnection) urlToRequest.openConnection();
                     urlConnection.setDoOutput(true);
@@ -164,13 +145,12 @@ public class ConsumerActivity extends Activity {
                     urlConnection.setRequestProperty("uploaded_file", filename);
 
                     DataOutputStream dos = new DataOutputStream(urlConnection.getOutputStream());
-
                     dos.writeBytes(twoHyphens + boundary + lineEnd);
                     dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
                             + filename + "\"" + lineEnd);
 
                     dos.writeBytes(lineEnd);
-                    dos.writeBytes(sb.toString());
+                    dos.writeBytes(data);
                     dos.writeBytes(lineEnd);
                     dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
 
@@ -197,6 +177,29 @@ public class ConsumerActivity extends Activity {
                 }
             }
         }.start();
+    }
+    private void Save()
+    {
+        final StringBuilder sb = new StringBuilder("timestamp, heartRate, gyroscopeX, gyroscopeY, gyroscopeZ, gyroscopeRotationX, gyroscopeRotationY, gyroscopeRotationZ, light\n");
+        for (JSONObject json:ConsumerService.SensorData) {
+            try {
+                sb.append(json.get("timestamp") + ",");
+                sb.append(json.get("heartRate") + ",");
+                JSONObject motion = (JSONObject) json.get("motion");
+                JSONObject gyroscope = (JSONObject) motion.get("gyroscope");
+                JSONObject gyroscopeRotation = (JSONObject) motion.get("gyroscopeRotation");
+                sb.append(gyroscope.get("x") + ",");
+                sb.append(gyroscope.get("y") + ",");
+                sb.append(gyroscope.get("z") + ",");
+                sb.append(gyroscopeRotation.get("x") + ",");
+                sb.append(gyroscopeRotation.get("y") + ",");
+                sb.append(gyroscopeRotation.get("z") + ",");
+                sb.append(json.get("light") + "\n");
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+        ServerUpload("Health", sb.toString());
     }
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
