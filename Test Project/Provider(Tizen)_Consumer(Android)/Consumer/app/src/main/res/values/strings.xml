@@ -12,5 +12,6 @@
     <string name="buttonConnect">Connect</string>
     <string name="buttonDisconnect">Disconnect</string>
     <string name="buttonSend">Send</string>
+    <string name="buttonSave">Save to server</string>
 
 </resources>

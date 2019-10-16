@@ -62,10 +62,10 @@ define({
         	
         	setInterval(function(){
         		gyroscopeSensor.getGyroscopeSensorData(function(sensorData){
-        			data.Gyroscope = sensorData;
+        			data.gyroscope = sensorData;
         		}, onerrorCB);
         		gyroscopeRotationVectorSensor.getGyroscopeRotationVectorSensorData(function(sensorData){
-        			data.GyroscopeRotation = sensorData;
+        			data.gyroscopeRotation = sensorData;
         		}, onerrorCB);
         	}, 200);
         	
@@ -75,7 +75,15 @@ define({
         
         function getData()
         {
-        	return data;
+        	var send_data = data;
+        	for(var sensorname in send_data) {
+    			send_data[sensorname] = {
+    					'x': Number(send_data[sensorname]['x'].toFixed(3)),
+    					'y': Number(send_data[sensorname]['y'].toFixed(3)),
+    					'z': Number(send_data[sensorname]['z'].toFixed(3))
+    			}
+    		}
+        	return send_data;
         }
         
         return {

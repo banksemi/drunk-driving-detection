@@ -23,6 +23,13 @@
 
 package com.samsung.android.sdk.accessory.example.helloaccessory.consumer;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +41,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +49,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONObject;
 
 public class ConsumerActivity extends Activity {
     private static TextView mTextView;
@@ -105,10 +115,89 @@ public class ConsumerActivity extends Activity {
                 }
                 break;
             }
+            case R.id.buttonSave:
+                Save();
+                break;
             default:
         }
     }
+    private void Save()
+    {
+        final StringBuilder sb = new StringBuilder("timestamp, heartRate, gyroscopeX, gyroscopeY, gyroscopeZ, gyroscopeRotationX, gyroscopeRotationY, gyroscopeRotationZ, light\n");
+        for (JSONObject json:ConsumerService.SensorData) {
+            try {
+                sb.append(json.get("timestamp") + ",");
+                sb.append(json.get("heartRate") + ",");
+                JSONObject motion = (JSONObject) json.get("motion");
+                JSONObject gyroscope = (JSONObject) motion.get("gyroscope");
+                JSONObject gyroscopeRotation = (JSONObject) motion.get("gyroscopeRotation");
+                sb.append(gyroscope.get("x") + ",");
+                sb.append(gyroscope.get("y") + ",");
+                sb.append(gyroscope.get("z") + ",");
+                sb.append(gyroscopeRotation.get("x") + ",");
+                sb.append(gyroscopeRotation.get("y") + ",");
+                sb.append(gyroscopeRotation.get("z") + ",");
+                sb.append(json.get("light") + "\n");
+            } catch (Exception e) {
 
+                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    String boundary = "*****";
+                    String lineEnd = "\r\n";
+                    String twoHyphens = "--";
+                    String filename = "file.txt";
+                    URL urlToRequest = new URL("https://api.easyrobot.co.kr/Test.php");
+                    HttpURLConnection urlConnection =
+                            (HttpURLConnection) urlToRequest.openConnection();
+                    urlConnection.setDoOutput(true);
+                    urlConnection.setDoInput(true);
+                    urlConnection.setRequestMethod("POST");
+                    urlConnection.setRequestProperty("Connection", "Keep-Alive");
+                    urlConnection.setRequestProperty("ENCTYPE", "multipart/form-data");
+                    urlConnection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+                    urlConnection.setRequestProperty("uploaded_file", filename);
+
+                    DataOutputStream dos = new DataOutputStream(urlConnection.getOutputStream());
+
+                    dos.writeBytes(twoHyphens + boundary + lineEnd);
+                    dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
+                            + filename + "\"" + lineEnd);
+
+                    dos.writeBytes(lineEnd);
+                    dos.writeBytes(sb.toString());
+                    dos.writeBytes(lineEnd);
+                    dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+                    int serverResponseCode = urlConnection.getResponseCode();
+                    String serverResponseMessage = urlConnection.getResponseMessage();
+
+
+                    BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+
+                    String inputLine;
+                    StringBuffer response = new StringBuffer();
+                    while ((inputLine = in.readLine()) != null) { response.append(inputLine); }
+
+                    Log.d("결과", response.toString());
+                    in.close();
+                    dos.flush();
+                    dos.close();
+
+                }
+                catch (Exception e)
+                {
+                    Log.e("에러", e.getMessage());
+                    //.makeText(getApplicationContext(), "에러" + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        }.start();
+    }
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -125,7 +214,7 @@ public class ConsumerActivity extends Activity {
     };
 
     public static void addMessage(String data) {
-        mMessageAdapter.addMessage(new Message(data));
+        mMessageAdapter.addMessage(new Message(ConsumerService.SensorData.size() + "개 수신\n" + data));
     }
 
     public static void updateTextView(final String str) {
