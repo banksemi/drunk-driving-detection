@@ -9,7 +9,7 @@ port=4000
 forceURL_only_debug = ""
 
 # If you want to force the URL, please uncomment below.
-forceURL_only_debug = "https://api.easyrobot.co.kr/upload/Health-2019-10-27 19-40-30.csv"
+# forceURL_only_debug = "https://api.easyrobot.co.kr/upload/Health-2019-10-27 19-40-30.csv"
 
 
 def algorithm(data):
@@ -22,9 +22,15 @@ def echo_handler(connectionSock, add):
     url = connectionSock.recv(1024).decode('utf-8');
     if forceURL_only_debug != "":
         url = forceURL_only_debug
+
     print('URL :', url)
 
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except:
+        connectionSock.close()
+        return;
+
     print("From URL status code: ", response.status_code)
     if response.status_code == 200:
         s = response.content
