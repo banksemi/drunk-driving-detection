@@ -3,6 +3,7 @@ import threading
 import pandas as pd
 import io
 import requests
+import re
 
 host=""
 port=4000
@@ -12,7 +13,7 @@ forceURL_only_debug = ""
 # forceURL_only_debug = "https://api.easyrobot.co.kr/upload/Health-2019-10-27 19-40-30.csv"
 
 
-def algorithm(data):
+def algorithm(type, data):
     return "not implemented"
 
 def echo_handler(connectionSock, add):
@@ -35,7 +36,12 @@ def echo_handler(connectionSock, add):
     if response.status_code == 200:
         s = response.content
         data = pd.read_csv(io.StringIO(s.decode('utf-8')))
-        result = algorithm(data)
+
+        m = re.match(r'.*upload/([a-zA-Z]+).*', url)
+        if len(m.regs) == 2:
+            result = algorithm(m[1], data)
+        else:
+            result = "parsing error";
     else:
         result = 'not found'
     print("Result :", result)
