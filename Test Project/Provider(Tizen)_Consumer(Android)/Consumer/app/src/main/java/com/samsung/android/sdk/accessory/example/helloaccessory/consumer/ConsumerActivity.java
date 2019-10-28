@@ -33,6 +33,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -40,6 +42,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -50,6 +53,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import org.json.JSONObject;
 
 public class ConsumerActivity extends Activity {
@@ -58,7 +63,22 @@ public class ConsumerActivity extends Activity {
     private boolean mIsBound = false;
     private ListView mMessageListView;
     private ConsumerService mConsumerService = null;
+    private Handler mHandler = new Handler()
+    {
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            Toast.makeText(ConsumerActivity.this, msg.getData().getString("text"), Toast.LENGTH_SHORT).show();
+        }
+    };
 
+    public void ToastMessage(String text)
+    {
+        Bundle bundle = new Bundle();
+        bundle.putString("text", text);
+        android.os.Message msg = new android.os.Message();
+        msg.setData(bundle);
+        mHandler.sendMessage(msg);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +89,16 @@ public class ConsumerActivity extends Activity {
         mMessageListView.setAdapter(mMessageAdapter);
         // Bind service
         mIsBound = bindService(new Intent(ConsumerActivity.this, ConsumerService.class), mConnection, Context.BIND_AUTO_CREATE);
+
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                FileSave.Save(getApplicationContext(),"Health", CSVFormating());
+                ToastMessage("Auto Save");
+            }
+        };
+        Timer timer = new Timer();
+        timer.schedule(task,1000,60000);
     }
 
     @Override
@@ -116,7 +146,7 @@ public class ConsumerActivity extends Activity {
                 break;
             }
             case R.id.buttonSave:
-                Save();
+                ServerUpload("Health", CSVFormating());
                 break;
             default:
         }
@@ -129,6 +159,7 @@ public class ConsumerActivity extends Activity {
             public void run() {
                 super.run();
                 try {
+                    ToastMessage("서버 업로드 준비");
                     String boundary = "*****";
                     String lineEnd = "\r\n";
                     String twoHyphens = "--";
@@ -163,7 +194,7 @@ public class ConsumerActivity extends Activity {
                     String inputLine;
                     StringBuffer response = new StringBuffer();
                     while ((inputLine = in.readLine()) != null) { response.append(inputLine); }
-
+                    ToastMessage("결과" + response.toString());
                     Log.d("결과", response.toString());
                     in.close();
                     dos.flush();
@@ -178,8 +209,8 @@ public class ConsumerActivity extends Activity {
             }
         }.start();
     }
-    private void Save()
-    {
+    private String CSVFormating() {
+        ToastMessage("CSV 포맷 변환중");
         final StringBuilder sb = new StringBuilder("timestamp, heartRate, gyroscopeX, gyroscopeY, gyroscopeZ, gyroscopeRotationX, gyroscopeRotationY, gyroscopeRotationZ, light\n");
         for (JSONObject json:ConsumerService.SensorData) {
             try {
@@ -199,8 +230,9 @@ public class ConsumerActivity extends Activity {
                 Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
-        ServerUpload("Health", sb.toString());
+        return sb.toString();
     }
+
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
