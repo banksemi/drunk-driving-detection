@@ -63,21 +63,21 @@ public class ConsumerActivity extends Activity {
     private boolean mIsBound = false;
     private ListView mMessageListView;
     private ConsumerService mConsumerService = null;
-    private Handler mHandler = new Handler()
-    {
-        @Override
-        public void handleMessage(android.os.Message msg) {
-            Toast.makeText(ConsumerActivity.this, msg.getData().getString("text"), Toast.LENGTH_SHORT).show();
-        }
-    };
+    private Handler mHandler = new Handler();
 
-    public void ToastMessage(String text)
+    public void ToastMessage(final String text)
     {
-        Bundle bundle = new Bundle();
-        bundle.putString("text", text);
-        android.os.Message msg = new android.os.Message();
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Toast.makeText(ConsumerActivity.this, text, Toast.LENGTH_SHORT).show();
+                } catch (Exception e)
+                {
+                    Log.e("에러",e.getMessage());
+                }
+            }
+        });
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,8 +212,11 @@ public class ConsumerActivity extends Activity {
     private String CSVFormating() {
         ToastMessage("CSV 포맷 변환중");
         final StringBuilder sb = new StringBuilder("timestamp, heartRate, gyroscopeX, gyroscopeY, gyroscopeZ, gyroscopeRotationX, gyroscopeRotationY, gyroscopeRotationZ, light\n");
-        for (JSONObject json:ConsumerService.SensorData) {
+        // JSONObject json:ConsumerService.SensorData
+
+        for (int i = 0; i < ConsumerService.SensorData.size(); i++) {
             try {
+                JSONObject json = ConsumerService.SensorData.get(i);
                 sb.append(json.get("timestamp") + ",");
                 sb.append(json.get("heartRate") + ",");
                 JSONObject motion = (JSONObject) json.get("motion");
