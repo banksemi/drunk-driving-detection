@@ -75,7 +75,7 @@ define({
                 	else
                 		SASocket.sendData(SAAgent.channelIds[0], JSON.stringify(message));
         		}
-            }, 200);
+            }, 1000);
 
         	HeartRateSensorStart();
             setInterval(HeartRateSensorStart, 60000);
