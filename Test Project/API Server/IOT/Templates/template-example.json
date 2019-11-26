@@ -1,0 +1,189 @@
+{
+    "values": {
+        "moisture_sensor":  "number",
+        "soil_sensor":  	"number",       
+        "cds_sensor":		"number",       
+        "co2_sensor":		"number",       
+        "ir_sensor":		"number",       
+        "us_sensor":		"number",       
+        "ht_temp_sensor":	"number",       
+        "temperature":  	"number", 
+        "humidity": 		"number", 
+        
+        "window_servo":		"number",       
+        "cam_lr_servo":  	"number", 
+        "cam_ud_servo": 	"number", 
+        
+        "fan_motor":		"boolean", 
+        "water_motor":  	"boolean", 
+        "air_motor":		"boolean", 
+        "heater_block": 	"boolean", 
+        
+        "uni_light1":  "boolean", 
+        "uni_light2":  "boolean", 
+        "uni_light3":  "boolean", 
+        "uni_button1":  "boolean", 
+        "uni_button2":  "boolean", 
+        "uni_button3":  "boolean", 
+        
+        "led":  "boolean", 
+        "relay":  "boolean", 
+        
+        "uni_sensor1":		"number",       
+        "uni_sensor2":  	"number", 
+        "uni_sensor3": 		"number", 
+        "uni_servo1":		"number",       
+        "uni_servo2":  		"number", 
+        "uni_servo3": 		"number", 
+        
+        "fnd1":  		"number", 
+        "fnd2": 		"number", 
+        "keypad": 		"number",
+        
+        "rgb": 		"string",
+        "rgb_led1": 		"string",
+        "rgb_led2": 		"string",
+        "lcd_line1":  "string",
+        "lcd_line2":  "string"
+    },
+    "layout": [
+        [
+            {
+                "mode": "switch",
+                "value": "fan_motor",
+                "name": "환기모터"
+            },
+            {
+                "mode": "switch",
+                "value": "water_motor",
+                "name": "워터펌프"
+            },
+            {
+                "mode": "switch",
+                "value": "air_motor",
+                "name": "에어펌프"
+            },
+            {
+                "mode": "switch",
+                "value": "heater_block",
+                "name": "난방히터"
+            }
+
+        ],
+
+        [
+            {
+                "mode": "pieGraph",
+                "value": "temperature",
+                "min": 0,
+                "max": 40,
+                "description": "Celsius",
+                "sign": "℃",
+                "name": "학원 온도"
+            },
+            {
+                "mode": "pieGraph",
+                "value": "humidity",
+                "min": 0,
+                "max": 100,
+                "description": "",
+                "sign": "％",
+                "name": "학원 습도"
+            },
+            {
+                "mode": "pieGraph",
+                "value": "relay",
+                "min": 0,
+                "max": 1,
+                "description": " ",
+                "sign": "",
+                "name": "학원 조명"
+            },
+            {
+                "mode": "pieGraph",
+                "value": "led",
+                "min": 0,
+                "max": 1,
+                "description": "",
+                "sign": "",
+                "name": "테스트LED"
+            }
+        ],
+
+        [
+            {
+                "mode": "pieGraph",
+                "value": "soil_sensor",
+                "min": 0,
+                "max": 100,
+                "description": "",
+                "sign": "％",
+                "name": "토양습도"
+            },
+            {
+                "mode": "pieGraph",
+                "value": "cds_sensor",
+                "min": 0,
+                "max": 1023,
+                "description": "Analog",
+                "sign": "％",
+                "name": "조도센서"
+            },
+            {
+                "mode": "pieGraph",
+                "value": "co2_sensor",
+                "min": 0,
+                "max": 100,
+                "description": " ",
+                "sign": "",
+                "name": "이산화탄소"
+            },
+            {
+                "mode": "pieGraph",
+                "value": "ht_temp_sensor",
+                "min": 0,
+                "max": 100,
+                "description": "",
+                "sign": "℃",
+                "name": "난방히터온도"
+            }
+        ],
+
+        [
+            {
+                "mode": "getLastData",
+                "value": "led"
+            },
+            {
+                "mode": "pieGraph",
+                "value": "led",
+                "min": 0,
+                "max": 100,
+                "description": "Celsius",
+                "sign": "m"
+            }
+        ],
+
+        [
+            {
+                "mode": "getLastData",
+                "value": "temperature",
+                "name": "온도 마지막 데이터"
+            }
+        ],
+        [
+            {
+                "mode": "list",
+                "value": "humidity",
+                "dataGroup": "each"
+            }
+        ],
+        [
+            {
+                "mode": "list",
+                "value": "temperature",
+                "dataGroup": "each"
+            }
+        ]
+    ]
+}
