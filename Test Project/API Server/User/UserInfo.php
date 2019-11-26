@@ -38,6 +38,15 @@
             }
         }
 
+        public static function InstanceFromUUID($uuid) {
+            $result = Mysql::Open("SELECT * FROM user JOIN branch ON user.branch_id=branch.branch_id WHERE uuid is not null and uuid=?", $uuid);
+            if ($row = $result->fetch_assoc())
+            {
+                return new UserInfo($row["id"]);
+            }
+            return new UserInfo(null);
+
+        }
         public function PasswordCheck($password)
         {
             return $this->password_hash == hash('sha256', $password);

@@ -51,4 +51,19 @@
     $_SESSION['count'] += 1;
     $_SESSION['log_v'] = "새로운 API 버전 개발 중";
 
+    $UUID = null;
+
+    if ($_POST["uuid"] != null) $UUID = $_POST["uuid"];
+    if ($_GET["uuid"] != null) $UUID = $_GET["uuid"];
+
+    if ($UUID != null) {
+        $t = UserInfo::InstanceFromUUID($UUID);
+        if ($t->id == null) {
+            APILevel::Need(APILevel::guest);
+            ErrorExit("UUID 코드가 올바르지 않습니다");
+        }
+        else {
+            $_SESSION["id"] = $t->id;
+        }
+    }
 ?>
