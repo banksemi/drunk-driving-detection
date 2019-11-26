@@ -1,0 +1,17 @@
+{
+    "values": {
+        "heartrate":  "number"
+    },
+    "layout": [
+		[   
+		    {"mode":"barChart", 
+		     "group":"hour",
+		     "value":[
+		    	{"name":"heartrate", "method":"min", "label":"최저 심박수" },
+		        {"name":"heartrate", "method":"avg", "label":"평균 심박수" },
+		        {"name":"heartrate", "method":"max", "label":"최대 심박수" }
+		     ]
+		    }
+		]
+    ]
+}

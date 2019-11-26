@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class DialogCreateApplicationComponent {
 
-  public selectedItem = "empty";
+  public selectedItem = "default";
   public EmptyLayout = false;
   constructor(protected ref: NbDialogRef<DialogCreateApplicationComponent>, private api : APIService, private router: Router) {}
 

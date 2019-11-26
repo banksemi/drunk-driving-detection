@@ -30,14 +30,14 @@ export class APIService {
     formdata.append('id', id);
     formdata.append('password', password);
 
-    const result = this.CreateResult(this.http.post('https://api.easyrobot.co.kr/Login.php', formdata));
+    const result = this.CreateResult(this.http.post('https://gp-api.easylab.kr/Login.php', formdata));
     result.AddMessage(this.toastr);
     return result;
   }
 
   public UpdateServerInformation()
   {
-    const result = this.CreateResult(this.http.get('https://api.easyrobot.co.kr/GetServerInfo.php'));
+    const result = this.CreateResult(this.http.get('https://gp-api.easylab.kr/GetServerInfo.php'));
     result.subscribe(data=>{
       this.serverName = data.server_info.site_name;
       this.footerMessage = data.server_info.footer_message;
@@ -46,31 +46,31 @@ export class APIService {
 
   public Logout(): ApiResult
   {
-    const result = this.CreateResult(this.http.get('https://api.easyrobot.co.kr/Logout.php'));
+    const result = this.CreateResult(this.http.get('https://gp-api.easylab.kr/Logout.php'));
     return result;
   }
 
   public GetUserInfo(): ApiResult
   {
-    const result = this.CreateResult(this.http.get('https://api.easyrobot.co.kr/GetUserInfo.php'));
+    const result = this.CreateResult(this.http.get('https://gp-api.easylab.kr/GetUserInfo.php'));
     return result;
   }
 
   public GetApplicationList(): ApiResult
   {
-    const result = this.CreateResult(this.http.get('https://api.easyrobot.co.kr/iot/GetApplicationList.php'));
+    const result = this.CreateResult(this.http.get('https://gp-api.easylab.kr/iot/GetApplicationList.php'));
     return result;
   }
 
   public GetApplicationInfo(name): ApiResult
   {
-    const result = this.CreateResult(this.http.get('https://api.easyrobot.co.kr/iot/GetApplicationInfo.php?application_name=' + name));
+    const result = this.CreateResult(this.http.get('https://gp-api.easylab.kr/iot/GetApplicationInfo.php?application_name=' + name));
     return result;
   }
 
   public GetIOTValueList(name): ApiResult
   {
-    const result = this.CreateResult(this.http.get('https://api.easyrobot.co.kr/iot/GetValueList.php?application_name=' + name));
+    const result = this.CreateResult(this.http.get('https://gp-api.easylab.kr/iot/GetValueList.php?application_name=' + name));
     return result;
   }
 
@@ -80,7 +80,7 @@ export class APIService {
     formdata.append('value', value);
     formdata.append('device', 'Web API');
 
-    const result = this.CreateResult(this.http.post('https://api.easyrobot.co.kr/iot/DataStream.php?token=' + token + '&key=' + key, formdata));
+    const result = this.CreateResult(this.http.post('https://gp-api.easylab.kr/iot/DataStream.php?token=' + token + '&key=' + key, formdata));
 
     return result;
   }
@@ -99,7 +99,7 @@ export class APIService {
       
     formdata.append('empty_layout', String(emptyLayout));
 
-    const result = this.CreateResult(this.http.post('https://api.easyrobot.co.kr/iot/CreateApplication.php', formdata));
+    const result = this.CreateResult(this.http.post('https://gp-api.easylab.kr/iot/CreateApplication.php', formdata));
     result.AddMessage(this.toastr);
     return result;
   }
@@ -111,7 +111,7 @@ export class APIService {
 
     formdata.append('layout', JSON.stringify(json));
 
-    const result = this.CreateResult(this.http.post('https://api.easyrobot.co.kr/iot/ChangeLayout.php', formdata));
+    const result = this.CreateResult(this.http.post('https://gp-api.easylab.kr/iot/ChangeLayout.php', formdata));
     result.AddMessage(this.toastr);
     return result;
 
@@ -125,7 +125,7 @@ export class APIService {
     formdata.append('type', 'add');
     formdata.append('count', count);
 
-    const result = this.CreateResult(this.http.post('https://api.easyrobot.co.kr/iot/ChangeLayout.php', formdata));
+    const result = this.CreateResult(this.http.post('https://gp-api.easylab.kr/iot/ChangeLayout.php', formdata));
     result.AddMessage(this.toastr);
     return result;
   }
@@ -139,7 +139,7 @@ export class APIService {
     formdata.append('createTime', createTime);
     formdata.append('component', JSON.stringify(component));
 
-    const result = this.CreateResult(this.http.post('https://api.easyrobot.co.kr/iot/ChangeLayout.php', formdata));
+    const result = this.CreateResult(this.http.post('https://gp-api.easylab.kr/iot/ChangeLayout.php', formdata));
     result.AddMessage(this.toastr);
     return result;
   }
@@ -152,7 +152,7 @@ export class APIService {
     formdata.append('type', 'delete');
     formdata.append('createTime', createTime);
 
-    const result = this.CreateResult(this.http.post('https://api.easyrobot.co.kr/iot/ChangeLayout.php', formdata));
+    const result = this.CreateResult(this.http.post('https://gp-api.easylab.kr/iot/ChangeLayout.php', formdata));
     result.AddMessage(this.toastr);
     return result;
   }
@@ -162,7 +162,7 @@ export class APIService {
     const formdata = new FormData();
     formdata.append('application_name', name);
 
-    const result = this.CreateResult(this.http.post('https://api.easyrobot.co.kr/iot/DeleteApplication.php', formdata));
+    const result = this.CreateResult(this.http.post('https://gp-api.easylab.kr/iot/DeleteApplication.php', formdata));
     result.AddMessage(this.toastr);
     return result;
   }
