@@ -1,0 +1,24 @@
+
+<div class="page">
+    <div class="logo"></div>
+    <form class="center" [formGroup]="form" (ngSubmit)="onSubmit(form.value)">
+        <div class="box">
+            <h3>로그인</h3>
+            <div class="tab">
+                <div class="tab_title">아이디</div>
+                <input type="email" class="ab" [formControl]="form.controls.id" />
+            </div>
+            <div class="tab">
+                <div class="tab_title">비밀번호</div>
+                <input type="password" class="ab" [formControl]="form.controls.password" />
+            </div>
+            <input type="checkbox" name="chk_info" value="HTML" id="a">
+            <label for="a">로그인 상태 유지</label>
+
+            <button type="submit">로그인</button>
+            <hr>
+            <div class="signUp"><a [routerLink]="[ '/sign-up' ]">회원가입</a></div>
+            <div class="forgot"><a href="">비밀번호 찾기</a></div>
+        </div>
+    </form>
+</div>

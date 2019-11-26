@@ -1,0 +1,30 @@
+<nb-card status="success">
+  <nb-card-body>
+      IOT 기기에서 사용할 토큰을 발급받을 수 있습니다.
+      <button nbButton (click)="open_create_application()" size="small" style="margin-left: 10px">새 어플리케이션 등록</button>
+  </nb-card-body>
+</nb-card>
+<nb-card accent="info">
+  <nb-card-header>내 어플리케이션</nb-card-header>
+  <nb-card-body>
+    <table class="table table-hover table-bordered">
+      <thead class="">
+        <tr>
+          <th>어플리케이션 이름</th>
+          <th>설명</th>
+          <th>생성 날짜</th>
+          <th>데이터 갱신</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of list" routerLink="./{{item.application_name}}">
+          <td>{{item.application_name}}</td>
+          <td>{{item.description}}</td>
+          <td>{{item.date}}</td>
+          <td>{{timeFormat(item.last_update)}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </nb-card-body>
+  <nb-card-footer>이 API는 {{api.serverName}}에서 제공중입니다. </nb-card-footer>
+</nb-card>

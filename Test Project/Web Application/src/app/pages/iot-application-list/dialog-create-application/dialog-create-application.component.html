@@ -1,0 +1,18 @@
+<nb-card style="width: 400px">
+  <nb-card-header>어플리케이션 등록</nb-card-header>
+  <nb-card-body>
+    <input #name nbInput placeholder="Name" style="margin-bottom: 10px">
+    <br>
+    <nb-select placeholder="Select Showcase" [(selected)]="selectedItem" style="width: 100%;margin-bottom: 10px">
+        <nb-option value="empty">빈 프로젝트</nb-option>
+        <nb-option value="iot-cake">케이크 센서 테스트 프로젝트</nb-option>
+        <nb-option value="smart-home">스마트 홈 프로젝트</nb-option>
+        <nb-option value="smart-farm">스마트 팜 프로젝트</nb-option>
+    </nb-select>
+    <nb-checkbox *ngIf="selectedItem != 'empty'" (checkedChange)="toggleEmptyLayout($event)">레이아웃을 구성하지 않음</nb-checkbox>
+  </nb-card-body>
+  <nb-card-footer>
+    <button class="cancel" nbButton status="danger" (click)="cancel()">뒤로가기</button>
+    <button nbButton status="success" (click)="submit(name.value)">등록 요청</button>
+  </nb-card-footer>
+</nb-card>
