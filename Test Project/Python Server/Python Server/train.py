@@ -22,7 +22,10 @@ def DFPreprocessing(data):
     # ' timestamp'처럼 공백이 들어간 컬럼 이름 수정
     data.columns = columns
     # 시간 데이터를 분 단위로 변경
-    data["time"] = (data["timestamp"] - data.loc[0, "timestamp"]) / 1000 / 60
+    if len(data) > 0:
+        data["time"] = (data["timestamp"] - data.loc[0, "timestamp"]) / 1000 / 60
+    else:
+        data["time"] = 0
     return data
 
 def read(htype, name):
@@ -120,27 +123,20 @@ def HeartRate(data, graph=False):
     # Fine Linear Curve without outlier data
     X = np.array(temp["time"]).reshape(-1, 1)
     Y = np.array(temp["heartRate"]).reshape(-1, 1)
-    rid = Ridge(alpha=90)
-    rid.fit(Preprocessing(X), Y)
-    
-    if (graph):
-        new_X_range = np.arange(0, temp["time"].max(), dtype=np.float64)
-        new_X = Preprocessing(new_X_range.reshape(-1,1))
-
-        plt.scatter(temp["time"], temp["heartRate"], c='c')
-        plt.plot(new_X_range, rid.predict(new_X), c='blue')
-
-        # In 10 minutes, Display heart rate using marker 'star'
-        plt.scatter([10], rid.predict(Preprocessing([10])), c='fuchsia', marker='*', s=500)
-
-        plt.show()
-    return [rid, temp]
+    if len(temp) > 0:
+        rid = Ridge(alpha=90)
+        rid.fit(Preprocessing(X), Y)
+        return [rid, temp]
+    else:
+        return [None, temp]
 
 def GetStat(column):
     return [column.mean(), column.std()]
 
 def GetFeature(label, item):
     model = HeartRate(item)[0]
+    if (model == None):
+        return None;
     heartrate = model.predict(np.array([0, 120]).reshape(-1,1)).reshape(-1)
     light = GetStat(item["light"])
     
@@ -167,7 +163,7 @@ def train():
     temp = []
     for label in data:
         # 임시로 하나씩만 로드
-        for item in data[label][:1]:
+        for item in data[label]:
             print("processing:", item["name"])
             temp.append(GetFeature(label, item['data']))
 
@@ -190,6 +186,7 @@ def train():
 def predict(data):
     global min_max_scaler, model
     X = GetFeature(None, data);
-
+    if (X is None):
+        return "Need more data"
     X_min_max_scaled = min_max_scaler.transform([X])
     return model.predict(X_min_max_scaled)[0]

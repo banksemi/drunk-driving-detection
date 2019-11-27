@@ -26,7 +26,7 @@
         $resultMessage->connect_error = socket_strerror(socket_last_error($socket));
     else
     {
-        $sendURL = "https://api.easyrobot.co.kr/".$path;
+        $sendURL = ServerInfo::$api_uri.$path;
      
         // 입력할 프로필의 고유 번호를 같이 전송한다.
 

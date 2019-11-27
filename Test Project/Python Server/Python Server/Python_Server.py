@@ -13,7 +13,7 @@ port=4000
 forceURL_only_debug = ""
 
 # If you want to force the URL, please uncomment below.
-forceURL_only_debug = "https://gp-api.easylab.kr/upload/Health-2019-10-29 23-56-55.csv"
+#forceURL_only_debug = "https://gp-api.easylab.kr/upload/Health-2019-10-29 23-56-55.csv"
 
 def saveData(token, key, value, time=None):
     if (time != None):
@@ -29,7 +29,7 @@ def algorithm(type, data, token):
     for index,row in new_data.iterrows():
         saveData(token, "heartrate", row["heartRate"], row["timestamp"]);
     saveData(token, "predict", result);
-    return "not implemented" + token
+    return result;
 
 def echo_handler(connectionSock, add):
     global forceURL_only_debug
