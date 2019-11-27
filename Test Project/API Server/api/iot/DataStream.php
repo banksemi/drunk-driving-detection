@@ -22,7 +22,7 @@
     {
         ValueCheck::String($_POST["value"], "입력할 데이터가 존재하지 않습니다 (POST 파라미터에 'value' 입력 필요)");
 
-        $result = $object->Insert($_GET["key"], $_POST["value"], $_POST["device"]);
+        $result = $object->Insert($_GET["key"], $_POST["value"], $_POST["device"], $_POST["time"]);
         if ($result == 1452) // 외래키로 설정된 토큰,키  쌍이 존재하지 않음.
         {
             ErrorExit("해당 어플리케이션에 입력한 변수가 존재하지 않습니다");

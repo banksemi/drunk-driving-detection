@@ -176,7 +176,7 @@ public class ConsumerActivity extends Activity {
                     String lineEnd = "\r\n";
                     String twoHyphens = "--";
                     String filename = "file.txt";
-                    URL urlToRequest = new URL("https://api.easyrobot.co.kr/Test.php?" + "type=" + type);
+                    URL urlToRequest = new URL("https://gp-api.easylab.kr/Test.php?" + "type=" + type + "&application_name=기본_프로필&uuid=" + UUIDManager.GetDevicesUUID(getApplicationContext()));
                     HttpURLConnection urlConnection =
                             (HttpURLConnection) urlToRequest.openConnection();
                     urlConnection.setDoOutput(true);

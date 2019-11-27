@@ -81,7 +81,7 @@
             return $list;
         }
 
-        public function Insert($key, $value, $device = null)
+        public function Insert($key, $value, $device = null, $time=null)
         {
 
             $value_info = $this->GetValueInfo($key);
@@ -91,10 +91,16 @@
             if ($value === null)
                 return IOTValueType::ErrorCode($value_type);
 
-            $result = Mysql::Insert("iot_data_n", 
-                array("application_no", "key", "value", "device"),
-                array($this->no, $key, $value, $device)
-            );
+            if ($time == null)
+                $result = Mysql::Insert("iot_data_n", 
+                    array("application_no", "key", "value", "device"),
+                    array($this->no, $key, $value, $device)
+                );
+            else
+                $result = Mysql::Insert("iot_data_n", 
+                    array("application_no", "key", "value", "device", "date"),
+                    array($this->no, $key, $value, $device, $time)
+                );
             // 성공했을 때만 데이터 갱신 일자 수정
             if ($result == 0)
             {
