@@ -17,16 +17,18 @@
                 $_SESSION["uuid"] = $UUID;
                 $t = UserInfo::InstanceFromUUID($UUID);
                 if ($t->id == null) {
-                    UserInfo::Create($UUID, $UUID, "MAIN");
-                    $_SESSION["id"] = $UUID;
+                    UUID::CreateIDFromUUID($UUID);
                     #APILevel::Need(APILevel::guest);
                     #ErrorExit("UUID 코드가 올바르지 않습니다");
                 }
-                else {
-                    $_SESSION["id"] = $t->id;
-                }
+                $_SESSION["id"] = $UUID;
             }
 
+        }
+
+        private static function CreateIDFromUUID($UUID){
+            UserInfo::Create($UUID, $UUID, "MAIN");
+            IOTApplication::Create(UserInfo::InstanceFromUUID($UUID), "기본 프로필", "기본 값으로 사용되는 프로필입니다.", "default");
         }
     }
 ?>

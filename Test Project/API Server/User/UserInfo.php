@@ -13,7 +13,7 @@
         private static $instance = null;
         public static function GetInstance()
         {
-            if (self::$instance == null)
+            if (self::$instance == null || self::$instance->id !== $_SESSION["id"])
                 self::$instance = new UserInfo($_SESSION["id"]);
             return self::$instance;
         }
