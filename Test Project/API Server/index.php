@@ -30,6 +30,7 @@
     
     include_once($server_path."User/APILevel.php"); // API 레벨 세팅, 권한 체크
     include_once($server_path."User/UserInfo.php"); // 유저 정보를 객체화
+    include_once($server_path."User/UUID.php"); // 고유 번호 로그인 기능 지원
     
     include_once($server_path."IOT/IOTApplication.php"); // IOT 어플리케이션을 객체화
     include_once($server_path."IOT/IOTValueType.php"); // IOT 변수 타입 세팅
@@ -51,19 +52,5 @@
     $_SESSION['count'] += 1;
     $_SESSION['log_v'] = "새로운 API 버전 개발 중";
 
-    $UUID = null;
-
-    if ($_POST["uuid"] != null) $UUID = $_POST["uuid"];
-    if ($_GET["uuid"] != null) $UUID = $_GET["uuid"];
-
-    if ($UUID != null) {
-        $t = UserInfo::InstanceFromUUID($UUID);
-        if ($t->id == null) {
-            APILevel::Need(APILevel::guest);
-            ErrorExit("UUID 코드가 올바르지 않습니다");
-        }
-        else {
-            $_SESSION["id"] = $t->id;
-        }
-    }
+    UUID::UUIDLogin();
 ?>

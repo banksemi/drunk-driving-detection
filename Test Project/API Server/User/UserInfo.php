@@ -45,11 +45,19 @@
                 return new UserInfo($row["id"]);
             }
             return new UserInfo(null);
-
         }
+
         public function PasswordCheck($password)
         {
             return $this->password_hash == hash('sha256', $password);
+        }
+
+        public static function Create($id, $uuid, $branch) {
+            $result = Mysql::Insert("user", 
+                array("id", "uuid", "branch_id"), 
+                array($id, $uuid, $branch)
+            );
+            return $result;
         }
     }
 ?>
