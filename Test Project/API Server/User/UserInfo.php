@@ -57,7 +57,10 @@
                 array("id", "uuid", "branch_id"), 
                 array($id, $uuid, $branch)
             );
-            return $result;
+            if ($result != 0)
+                return $result;
+            else
+                return new UserInfo($id);
         }
     }
 ?>
