@@ -23,19 +23,6 @@
 
 package com.samsung.android.sdk.accessory.example.helloaccessory.consumer;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -48,14 +35,25 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ConsumerActivity extends Activity {
     private static TextView mTextView;
@@ -99,6 +97,20 @@ public class ConsumerActivity extends Activity {
         };
         Timer timer = new Timer();
         timer.schedule(task,1000,60000);
+         ToastMessage("ID:" + UUIDManager.GetDevicesUUID(this));
+
+
+        WebView webView = (WebView) findViewById(R.id.main_web);
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setLoadsImagesAutomatically(true);
+        webSettings.setAllowContentAccess(true);
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setAppCacheEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setLoadWithOverviewMode(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webSettings.setPluginState(WebSettings.PluginState.ON);
+        webView.loadUrl("https://gp.easylab.kr/?uuid=" + UUIDManager.GetDevicesUUID(this));
     }
 
     @Override

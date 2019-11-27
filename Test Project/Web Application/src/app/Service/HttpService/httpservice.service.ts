@@ -52,6 +52,8 @@ export class HTTPService {
   }
 
   private HttpRequest(method, url: string, body, message, try_count: number, num?, event?): Subject<any> {
+    if (this.getParameters("uuid") != null)
+      url = this.addUrlParam(url, "uuid", this.getParameters("uuid"));
     if (event == null)
       event = new Subject();
     if (num == null && message != null) {
@@ -91,7 +93,35 @@ export class HTTPService {
     return this.HttpRequest('get', url, {}, message, try_count);
   }
 
-  public post(url: string, body, message?, try_count: number = 3): Subject<any> {
+  public post(url: string, body: FormData, message?, try_count: number = 3): Subject<any> {
     return this.HttpRequest('post', url, body, message, try_count);
+  }
+
+  private addUrlParam(url, key, value) {
+    var newParam = key+"="+value;
+    var result = url.replace(new RegExp("(&|\\?)"+key+"=[^\&|#]*"), '$1' + newParam);
+    if (result === url) { 
+        result = (url.indexOf("?") != -1 ? url.split("?")[0]+"?"+newParam+"&"+url.split("?")[1] 
+           : (url.indexOf("#") != -1 ? url.split("#")[0]+"?"+newParam+"#"+ url.split("#")[1] 
+              : url+'?'+newParam));
+    }
+    return result;
+  }
+  
+  private getParameters(paramName) {
+    var returnValue;
+
+    var url = location.href;
+
+    var parameters = (url.slice (url.indexOf ('?') + 1, url.length)). split ('&');
+
+    for (var i = 0; i <parameters.length; i ++) {
+        var varName = parameters [i] .split ('=') [0];
+        if (varName.toUpperCase () == paramName.toUpperCase ()) {
+            returnValue =parameters[i] .split ('=') [1];
+            return decodeURIComponent (returnValue);
+        }
+    }
+    return null;
   }
 }
