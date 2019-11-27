@@ -1,6 +1,6 @@
 <?
     include_once("../index.php");
-    APILevel::Need(APILevel::guest);
+    APILevel::Need(APILevel::student);
     
     $file = $_FILES['uploaded_file'];
     $_SESSION["file"] = $file;
@@ -10,7 +10,7 @@
 
     $resultMessage->error = null;
 
-    $address = "192.168.1.204"; // 접속할 IP //
+    $address = "192.168.1.80"; // 접속할 IP //
     $port = 4000; // 접속할 PORT //
     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP); // TCP 통신용 소켓 생성 //
    
@@ -27,7 +27,13 @@
     else
     {
         $sendURL = "https://api.easyrobot.co.kr/".$path;
-        socket_write($socket, $sendURL, strlen($sendURL));
+     
+        // 입력할 프로필의 고유 번호를 같이 전송한다.
+
+        $user = UserInfo::GetInstance();
+        $token = IOTApplication::GetToken($user, $_GET["application_name"]);
+        $data = $token."|".$sendURL;
+        socket_write($socket, $data, strlen($data));
         $resultMessage->result = socket_read($socket, 1024);
         socket_close($socket);
     }

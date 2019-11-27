@@ -10,17 +10,22 @@ port=4000
 forceURL_only_debug = ""
 
 # If you want to force the URL, please uncomment below.
-# forceURL_only_debug = "https://api.easyrobot.co.kr/upload/Health-2019-10-27 19-40-30.csv"
+forceURL_only_debug = "https://api.easyrobot.co.kr/upload/Health-2019-10-29 23-56-55.csv"
 
 
-def algorithm(type, data):
-    return "not implemented"
+def algorithm(type, data, token):
+    return "not implemented" + token
 
 def echo_handler(connectionSock, add):
     global forceURL_only_debug
     print("--------------------------------------")
     print("Connected", add)
-    url = connectionSock.recv(1024).decode('utf-8');
+    received = connectionSock.recv(1024).decode('utf-8');
+    received = received.split("|");
+    token = received[0];
+    url = received[1];
+    print('Original Token :', token)
+    print('Original URL :', url)
     if forceURL_only_debug != "":
         url = forceURL_only_debug
 
@@ -39,7 +44,7 @@ def echo_handler(connectionSock, add):
 
         m = re.match(r'.*upload/([a-zA-Z]+).*', url)
         if len(m.regs) == 2:
-            result = algorithm(m[1], data)
+            result = algorithm(m[1], data, token)
         else:
             result = "parsing error";
     else:
