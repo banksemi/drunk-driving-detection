@@ -7,12 +7,13 @@
         public static $month = -3;
         private static function UpdateByEachHour($method)
         {
+            // 임시로  WHERE DATE(`date`) >= DATE((NOW() - INTERVAL 1 day)) 삭제
             $result = Mysql::Open(
                 "INSERT 
                     INTO iot_statistics_n2(`application_no`, `key`, `date`, `time`, `statistics_method`, `data`)
                     SELECT t.`application_no`, t.`key`, t.`date`, t.`time`, ?, t.`data` FROM
                         (SELECT `application_no`, `key`, `date`, hour(`date`) as `time`, $method(CAST(`value` AS DOUBLE)) as `data` 
-                            FROM iot_data_n WHERE DATE(`date`) >= DATE((NOW() - INTERVAL 1 day))
+                            FROM iot_data_n
                             GROUP BY `application_no`, `key`, DATE_FORMAT(`date`, '%Y-%m-%d %H')
                         ) 
                     AS t
