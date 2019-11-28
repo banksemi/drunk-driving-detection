@@ -1,0 +1,50 @@
+@import '../../../@theme/styles/themes';
+
+@include nb-install-component() {
+  table
+  {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  table td
+  {
+    padding-right: 10px;
+    text-align: center;
+    height: 46px;
+    width: 70%;
+  }
+  table td:first-child
+  {
+    width: 30%;
+  }
+  table td:not(:first-child)
+  {
+    padding-right: 30px;
+  }
+  table td
+  {
+    padding-right: 10px;
+    text-align: center;
+  }
+  table td.important
+  {
+    
+    font-weight: 700;
+  }
+
+  table td.flex-box
+  {
+    width: 100%;
+    display: flex;
+  }
+  
+  .flex-box .item
+  {
+    margin-left: 20px;
+    display: inline;
+  }
+  .flex-box nb-select.item
+  {
+    width: 170px;
+  }
+}

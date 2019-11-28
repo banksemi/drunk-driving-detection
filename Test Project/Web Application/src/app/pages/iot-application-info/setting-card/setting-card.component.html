@@ -1,0 +1,101 @@
+<nb-card>
+  <nb-card-header>
+    <h6>{{name}}</h6>
+  </nb-card-header>
+
+  <nb-card-body>
+    <table>
+      <tr>
+        <td>Component Title (Header)</td>
+        <td><input nbInput fullWidth placeholder="Name" (input)="Title=$event.target.value"></td>
+      </tr>
+      <tr>
+        <td>Card Size</td>
+        <td>
+          <nb-select placeholder="Select Showcase" [(selected)]="CardSize" fullWidth>
+            <nb-option value="null">기본값</nb-option>
+            <nb-option value="tiny">작음</nb-option>
+            <nb-option value="medium">중간</nb-option>
+            <nb-option value="large">큼</nb-option>
+            <nb-option value="giant">매우 큼</nb-option>
+          </nb-select>
+        </td>
+      </tr>
+    </table>
+
+    <hr>
+    <table>
+      <tr>
+        <td class="important">Layout Style</td>
+        <td>
+          <nb-select placeholder="Select Showcase" [(selected)]="Mode" fullWidth  (selectedChange)="ChangeMode()">
+            <nb-option-group title="Any Type (Can Grouping)">
+              <nb-option value="getLastData">마지막 데이터만 표시</nb-option>
+              <nb-option value="list">테이블 형태</nb-option>
+              <nb-option value="barChart">막대 그래프</nb-option>
+            </nb-option-group>
+            <nb-option-group title="Number">
+              <nb-option value="pieGraph">원형 다이얼</nb-option>
+            </nb-option-group>
+            <nb-option-group title="Boolean">
+              <nb-option value="switch">스위치형 컴포넌트 (ON-OFF)</nb-option>
+            </nb-option-group>
+          </nb-select>
+        </td>
+      </tr>
+
+      <tr *ngIf="Group != null">
+        <td class="important">Grouping</td>
+        <td>
+          <nb-select placeholder="Select Showcase" [(selected)]="Group" fullWidth (selectedChange)="ChangeGroup()">
+            <nb-option value="each">그룹화 없음</nb-option>
+            <nb-option value="hour">시간 단위로 그룹화 (최대 24개)</nb-option>
+            <nb-option value="day">날짜 단위로 그룹화 (최대 30개)</nb-option>
+          </nb-select>
+        </td>
+      </tr>
+      <tr *ngFor="let value of Values; let i = index">
+        <td class="important">Value</td>
+        <td class="flex-box">
+          <nb-select fullWidth style="flex : 1;" [(selected)]="value['name']">
+            <nb-option-group  *ngFor="let groupitem of values | keyvalue" [title]="groupitem.key">
+              <nb-option *ngFor="let item of groupitem.value" [value]="item.name">{{item.name}}</nb-option>
+            </nb-option-group>
+          </nb-select>
+          <input #name nbInput fullWidth placeholder="Label" style="flex : 1;" *ngIf="Mode == 'barChart'" (input)="value['label'] = $event.target.value">
+          <nb-select *ngIf="Group != null && Group != 'each'" class="item" [(selected)]="value['method']">
+            <nb-option value="count">데이터 개수(count)</nb-option>
+            <nb-option value="sum">합계 (sum)</nb-option>
+            <nb-option value="avg">평균 (average)</nb-option>
+            <nb-option value="min">최소 (min)</nb-option>
+            <nb-option value="max">최대 (max)</nb-option>
+          </nb-select>
+          <div class="item">
+            <button nbButton status="success" (click)="value_push()" *ngIf="i == 0">+</button>
+            <button nbButton status="danger" (click)="value_pop(i)" *ngIf="i != 0">-</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div *ngIf="Mode=='pieGraph'">
+      <hr>
+      <table>
+          <tr>
+            <td>Min</td>
+            <td><input nbInput fullWidth placeholder="Min" (input)="Min=$event.target.value"></td>
+          </tr>
+          <tr>
+            <td>Max</td>
+            <td>
+                <input nbInput fullWidth placeholder="Max" (input)="Max=$event.target.value">
+            </td>
+          </tr>
+        </table>
+    </div>
+    <nb-card-footer>
+      
+        <button nbButton status="success" (click)="finish()">등록하기</button>
+    </nb-card-footer>
+  </nb-card-body>
+
+</nb-card>

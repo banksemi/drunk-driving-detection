@@ -1,0 +1,89 @@
+<div *ngIf="data != null">
+
+  <nb-card accent="info">
+    <nb-card-header class="flex">
+      <h2>
+        {{data.application_name}}
+      </h2>
+      <button nbButton status="primary" (click)="ManagementMode = !ManagementMode" *ngIf="!ManagementMode">관리 모드 활성화</button>
+      <button nbButton status="danger" (click)="DeleteApplication()" *ngIf="ManagementMode">프로필 제거</button>
+      <button nbButton status="primary" (click)="ManagementMode = !ManagementMode" *ngIf="ManagementMode">관리 모드 종료</button>
+    </nb-card-header>
+    <nb-card-body>
+      <span *ngIf="data.description == null || data.description ==''">이 프로필에 대한 설명이 존재하지 않습니다.</span>
+      {{data.description}}
+    </nb-card-body>
+    <!-- <nb-card-footer>Token : {{data.token}}</nb-card-footer> -->
+  </nb-card>
+
+  <div class="row" *ngFor="let row of data.layout">
+    <div class="col" *ngFor="let item of row">
+      <button nbButton status="danger" (click)="DeleteComponent(item.createTime)" *ngIf="ManagementMode" class="DeleteComponent">X</button>
+      <!-- 직접 카드 구성이 필요한 경우 -->
+      <ngx-status-card [title]="item.name" [type]="item.type" *ngIf="item.mode == 'switch'" [on]="item.data[0][0]?.value == 1" (onChange)="valueUpdate(item.value[0].name, $event)">
+        <i [ngClass]="item.icon"></i>
+      </ngx-status-card>
+
+      <ngx-setting-card *ngIf="item.mode == 'undefined'" (onFinish)="settingCard(item.createTime, $event)" [name]="item.name" [values]="IOTValues">
+      </ngx-setting-card>
+
+      <nb-card [size]="item.cardSize != null ? item.cardSize : null" *ngIf="item.mode != 'switch' && item.mode != 'undefined'">
+        <nb-card-header>
+          <h6>{{item.name}}</h6>
+        </nb-card-header>
+
+        <nb-card-body *ngIf="item.data[0].length == 0">
+          <h6>데이터가 없습니다.</h6>데이터가 전송되기 시작하면 UI가 자동으로 그려집니다.
+        </nb-card-body>
+        
+        <nb-card-body *ngIf="item.data[0].length != 0">
+          <div *ngIf="item.mode =='barChart'">
+              <chart type="bar" [data]="item.chartData" [options]="item.options" style="height: 300px;"></chart>
+          </div>
+          <div *ngIf ="item.mode == 'list'">
+              <nb-list>
+                  <nb-list-item *ngFor="let eachitem of item.data[0]">
+                      <b style="margin-right:30px">{{ eachitem.datetime }}</b> {{ eachitem.value }}
+                  </nb-list-item>
+                </nb-list>
+          </div>
+          <div *ngIf="item.mode == 'getLastData'">
+            <b>마지막 갱신일 : </b>{{item.data[0][0].datetime}} <br>
+            <b>Raw 데이터 : </b>{{item.data[0][0].value}} <br>
+          </div>
+          <div *ngIf="item.mode == 'pieGraph'">
+            <div class="slider-container">
+              <ngx-temperature-dragger [(value)]="item.data[0][0].value" (power)="temperatureOff = !$event" [min]="+item.min"
+                [max]="+item.max" [disableArcColor]="theme.arcEmpty" [fillColors]="theme.arcFill"
+                [thumbBg]="theme.thumbBg" [thumbBorderColor]="theme.thumbBorder" (valueChange)="valueUpdate(item.value[0].name, $event)">
+
+                <div class="slider-value-container" [ngClass]="{ 'off': temperatureOff }">
+                  <div class="value h1">
+                    {{ temperatureOff ? '--' : (parseInt(item.data[0][0]?.value)) }}{{item.sign}}
+                  </div>
+                  <div class="desc">
+                    {{item.description}}
+                  </div>
+                </div>
+              </ngx-temperature-dragger>
+            </div>
+
+            <b>마지막 갱신일 : </b>{{item.data[0][0].datetime}}
+          </div>
+        </nb-card-body>
+
+      </nb-card>
+    </div>
+  </div>
+  <nb-card *ngIf="ManagementMode">
+    <nb-card-header>
+      컴포넌트 추가
+    </nb-card-header>
+    <nb-card-body>
+        <button nbButton status="success" (click)="AddLayout(1)" style="margin-right: 10px">[card]</button>
+        <button nbButton status="success" (click)="AddLayout(2)" style="margin-right: 10px">[card * 2]</button>
+        <button nbButton status="success" (click)="AddLayout(3)" style="margin-right: 10px">[card * 3]</button>
+        <button nbButton status="success" (click)="AddLayout(4)" style="margin-right: 10px">[card * 4]</button>
+    </nb-card-body>
+    </nb-card>
+</div>

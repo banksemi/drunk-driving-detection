@@ -1,0 +1,41 @@
+{
+    "values": {
+		"heartrate":  "number",
+		"predict": "string"
+    },
+    "layout": [
+		[   
+		    {
+				"name": "시간에 따른 심박수 변화",
+				"mode":"barChart", 
+				"group":"hour",
+				"value":[
+					{"name":"heartrate", "method":"min", "label":"최저 심박수" },
+					{"name":"heartrate", "method":"avg", "label":"평균 심박수" },
+					{"name":"heartrate", "method":"max", "label":"최대 심박수" }
+				]
+		    }
+		],
+		
+		[   
+		    {
+				"name": "전체 심박수 데이터",
+				"mode":"barChart", 
+				"group":"each",
+				"value":[
+					{"name":"heartrate", "label":"심박수" }
+				]
+		    }
+		],
+		[   
+		    {
+				"name": "활동 데이터",
+				"mode":"list", 
+				"group":"each",
+				"value":[
+					{"name":"predict"}
+				]
+		    }
+		]
+    ]
+}

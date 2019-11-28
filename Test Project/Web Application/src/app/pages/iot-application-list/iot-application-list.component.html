@@ -1,0 +1,30 @@
+<nb-card status="success">
+  <nb-card-body>
+      이곳에서 개인별 프로필을 설정할 수 있습니다.
+      <button nbButton (click)="open_create_application()" size="small" style="margin-left: 10px">새 프로필 생성</button>
+  </nb-card-body>
+</nb-card>
+<nb-card accent="info">
+  <nb-card-header>프로필 리스트</nb-card-header>
+  <nb-card-body>
+    <table class="table table-hover table-bordered">
+      <thead class="">
+        <tr>
+          <th>이름</th>
+          <th>설명</th>
+          <th>생성 날짜</th>
+          <th>마지막 데이터 갱신</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of list" routerLink="./{{item.application_name}}">
+          <td>{{item.application_name}}</td>
+          <td>{{item.description}}</td>
+          <td>{{item.date}}</td>
+          <td>{{timeFormat(item.last_update)}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </nb-card-body>
+  <nb-card-footer>이 API는 {{api.serverName}}에서 제공중입니다. </nb-card-footer>
+</nb-card>
