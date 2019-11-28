@@ -88,16 +88,22 @@ public class ConsumerActivity extends Activity {
         // Bind service
         mIsBound = bindService(new Intent(ConsumerActivity.this, ConsumerService.class), mConnection, Context.BIND_AUTO_CREATE);
 
-        TimerTask task = new TimerTask() {
+        new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 FileSave.Save(getApplicationContext(),"Health", CSVFormating());
                 ToastMessage("Auto Save");
             }
-        };
-        Timer timer = new Timer();
-        timer.schedule(task,1000,60000);
-         ToastMessage("ID:" + UUIDManager.GetDevicesUUID(this));
+        },1000,60000);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                ServerUpload("Health", CSVFormating());
+            }
+        },60000 * 10,60000 * 10);
+
+
 
 
         WebView webView = (WebView) findViewById(R.id.main_web);
