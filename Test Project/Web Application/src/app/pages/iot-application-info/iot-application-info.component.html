@@ -38,7 +38,7 @@
         
         <nb-card-body *ngIf="item.data[0].length != 0">
           <div *ngIf="item.mode =='barChart'">
-              <chart type="bar" [data]="item.chartData" [options]="item.options" style="height: 300px;"></chart>
+              <chart type="line" [data]="item.chartData" [options]="item.options" style="height: 300px;"></chart>
           </div>
           <div *ngIf ="item.mode == 'list'">
               <nb-list>
