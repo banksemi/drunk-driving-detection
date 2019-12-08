@@ -1,15 +1,16 @@
 
+import math
 import sys
 import warnings
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
 # Delete warning message
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
     os.environ["PYTHONWARNINGS"] = "ignore"
-
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 
 columns = ['timestamp', 'heartRate', 'gyroscopeX', 'gyroscopeY', 'gyroscopeZ', 'gyroscopeRotationX', 'gyroscopeRotationY', 'gyroscopeRotationZ', 'light']
 
@@ -17,6 +18,7 @@ data = {}
 data["drink"] = []
 data["workout"] = []
 data["nothing"] = []
+
 def DFPreprocessing(data):
     global columns
     # ' timestamp'처럼 공백이 들어간 컬럼 이름 수정
@@ -32,21 +34,36 @@ def read(htype, name):
     temp = pd.read_csv(name)
     DFPreprocessing(temp)
     
-    data[htype].append({'name':name, 'data': create_clip(temp, 0, 0)})
-    for i in range(0,20,4):
-        data[htype].append({'name':name+str(i), 'data': create_clip(temp, i, i)})
+    max_time = temp["time"].max()
+    data[htype].append({'name':name, 'data': create_clip(temp, 0, max_time)})
+
+
+    for i in range(0,1000,10):
+        if (i > max_time - 15):
+            break;
+        for j in range(15,121,15):
+            try:
+                print("{} ({}~{})".format(name,i , i+j))
+                data[htype].append({'name':"{} ({}~{})".format(name,i , i+j), 'data': create_clip(temp, i, i + j)})
+            except:
+                print("에러")
+            if (i + j > max_time):
+                break;
+
 
 
 def create_clip(temp, addtime1, addtime2, limit=120):
     temp = temp.loc[temp["time"] >= addtime1]
-    temp = temp.loc[temp["time"] <= (limit + addtime2)]
+    temp = temp.loc[temp["time"] <= addtime2]
     temp = pd.DataFrame(np.array(temp), columns=temp.columns)
     temp["time"] = temp["time"] - temp.loc[0,"time"]
     temp = temp.loc[temp["time"] < limit]
+
+    if (len(temp) < 60 * 10):
+        raise Exception
+    
     return temp
 
-
-import math
 
 def search(dirname, files):
     try:
@@ -160,12 +177,21 @@ model = None
 def train():
     global min_max_scaler, model
     data_load()
+    if not os.path.isdir("Cache"):
+        os.makedirs("Cache")
     temp = []
     for label in data:
-        # 임시로 하나씩만 로드
         for item in data[label]:
             print("processing:", item["name"])
-            temp.append(GetFeature(label, item['data']))
+            cache_name = item["name"]
+            t = cache_name.split("\\")
+            cache_name = "Cache/" + t[len(t) - 1]
+            if not os.path.isfile(cache_name + '.npy'):
+                np.save(cache_name, GetFeature(label, item['data']))
+
+            loaded_data = np.load(cache_name + '.npy',allow_pickle=True)
+            if (len(loaded_data.shape) != 0):
+                temp.append(list(loaded_data))
 
     df = pd.DataFrame(temp, columns=['class', 'heartrate', 'heartrate2', 'light_mean', 'light_std'
                                     , 'gyroscope_mean', 'gyroscope_std', 'gyroscopeX_mean', 'gyroscopeX_std'
@@ -179,9 +205,9 @@ def train():
 
     model = DecisionTreeClassifier(max_depth=7)
     model.fit(X_min_max_scaled, Y)
-    # cv_scores = cross_val_score(model, X_min_max_scaled, Y, cv=5)
-    # print(cv_scores.mean())
-    print("S")
+    cv_scores = cross_val_score(model, X_min_max_scaled, Y, cv=5)
+    print(Y.value_counts())
+    print("Model Score:", cv_scores.mean())
 
 def predict(data):
     global min_max_scaler, model
