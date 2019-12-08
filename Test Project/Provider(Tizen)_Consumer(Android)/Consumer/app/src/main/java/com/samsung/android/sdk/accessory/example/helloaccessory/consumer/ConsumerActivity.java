@@ -77,6 +77,8 @@ public class ConsumerActivity extends Activity {
             }
         });
     }
+    public int relax_heartrate = 0;
+    public int sending_delay = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,16 +90,45 @@ public class ConsumerActivity extends Activity {
         // Bind service
         mIsBound = bindService(new Intent(ConsumerActivity.this, ConsumerService.class), mConnection, Context.BIND_AUTO_CREATE);
 
-        TimerTask task = new TimerTask() {
+        new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 FileSave.Save(getApplicationContext(),"Health", CSVFormating());
-                ToastMessage("Auto Save");
             }
-        };
-        Timer timer = new Timer();
-        timer.schedule(task,1000,60000);
-         ToastMessage("ID:" + UUIDManager.GetDevicesUUID(this));
+        },1000,60000);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                int now = 0;
+                int count = 0;
+                for(int i = ConsumerService.SensorData.size() - 1; i >= 0 && i >= ConsumerService.SensorData.size() - 300; i++) {
+                    try {
+                        int rate = ConsumerService.SensorData.get(i).getInt("heartRate");
+                        if (rate > 10) {
+                            now += rate;
+                            count++;
+                        }
+                    } catch (Exception e) {}
+                }
+                if (count != 0)
+                    now /= count;
+
+                if (relax_heartrate > now) relax_heartrate = now;
+
+                int need_delay = 5 - (relax_heartrate - now) / 10;
+                if (need_delay < 0) need_delay = 0;
+
+                if (sending_delay < need_delay) {
+                    ServerUpload("Health", CSVFormating());
+                    sending_delay = 0;
+                } else {
+                    sending_delay++;
+                }
+            }
+        },60000 * 10,60000 * 10);
+
+
 
 
         WebView webView = (WebView) findViewById(R.id.main_web);

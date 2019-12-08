@@ -23,22 +23,24 @@
 
 package com.samsung.android.sdk.accessory.example.helloaccessory.consumer;
 
+import android.content.Intent;
+import android.os.Binder;
+import android.os.Handler;
+import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.samsung.android.sdk.SsdkUnsupportedException;
+import com.samsung.android.sdk.accessory.SA;
+import com.samsung.android.sdk.accessory.SAAgent;
+import com.samsung.android.sdk.accessory.SAPeerAgent;
+import com.samsung.android.sdk.accessory.SASocket;
+
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import android.content.Intent;
-import android.os.Handler;
-import android.os.Binder;
-import android.os.IBinder;
-import android.util.JsonReader;
-import android.widget.Toast;
-import android.util.Log;
-
-import com.samsung.android.sdk.SsdkUnsupportedException;
-import com.samsung.android.sdk.accessory.*;
-
-import org.json.JSONObject;
 
 public class ConsumerService extends SAAgent {
     public static List<JSONObject> SensorData = new ArrayList<>();
@@ -154,6 +156,15 @@ public class ConsumerService extends SAAgent {
             final String message = new String(data);
             try
             {
+                JSONObject last_data = new JSONObject(message);
+                if (SensorData.size() > 0) {
+                    JSONObject first_data = SensorData.get(0);
+                    float time = last_data.getInt("timestamp") - first_data.getInt("timestamp");
+                    time /= 1000;
+                    if (time >= 60 * 100) {
+                        SensorData.remove(0);
+                    }
+                }
                 SensorData.add(new JSONObject(message));
             } catch (Exception e) { }
             addMessage("Received: ", message);
