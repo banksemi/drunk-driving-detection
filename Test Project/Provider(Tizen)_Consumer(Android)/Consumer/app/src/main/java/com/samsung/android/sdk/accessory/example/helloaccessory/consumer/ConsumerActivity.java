@@ -100,6 +100,16 @@ public class ConsumerActivity extends Activity {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
+                // 자동 연결
+                if (mIsBound == true && mConsumerService != null) {
+                    mConsumerService.findPeers();
+                }
+            }
+        },1000,60000);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
                 int now = 0;
                 int count = 0;
                 for(int i = ConsumerService.SensorData.size() - 1; i >= 0 && i >= ConsumerService.SensorData.size() - 300; i++) {
