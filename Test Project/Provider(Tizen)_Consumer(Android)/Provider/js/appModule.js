@@ -28,6 +28,7 @@ define({
     name: 'app',
     requires: [
                'models/heartRate',
+               'models/pedometer',
                'models/motion',
                'models/light',
                'core/event'
@@ -36,7 +37,7 @@ define({
         'use strict';
 
         var lastData = {};
-        var event = req.core.event, heartRate = req.models.heartRate, motion=req.models.motion, light=req.models.light;
+        var event = req.core.event, heartRate = req.models.heartRate, motion=req.models.motion, light=req.models.light, pedometer=req.models.pedometer;
         console.log('app::def');
 
         function HeartRateSensorStart()
@@ -70,6 +71,7 @@ define({
                 	message.motion = motion.getData();
                 	message.timestamp = new Date().getTime();
                 	message.light = light.getData();
+                	message.pedometer = pedometer.getData();
                 	if (DEBUG_MODE == true)
                     	console.log(JSON.stringify(message));
                 	else

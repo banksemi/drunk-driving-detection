@@ -6,6 +6,7 @@
     <tizen:metadata key="AccessoryServicesLocation" value="res/xml/accessoryservices.xml"/>
     <tizen:privilege name="http://developer.samsung.com/privilege/accessoryprotocol"/>
     <tizen:privilege name="http://developer.samsung.com/privilege/healthinfo"/>
+    <tizen:privilege name="http://tizen.org/feature/sensor.pedometer"/>
     <tizen:privilege name="http://tizen.org/privilege/healthinfo"/>
     <icon src="icon.png"/>
     <name>HelloAccessoryProvider</name>
