@@ -1,5 +1,9 @@
 <?
     include_once("../index.php");
+
+    error_reporting(0);
+
+
     APILevel::Need(APILevel::student);
     
     $file = $_FILES['uploaded_file'];
@@ -10,14 +14,14 @@
 
     $resultMessage->error = null;
 
-    $address = "192.168.1.80"; // 접속할 IP //
+    $address = "192.168.1.49"; // 접속할 IP //
     $port = 4000; // 접속할 PORT //
     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP); // TCP 통신용 소켓 생성 //
    
     if ($socket === false)
         $resultMessage->create_error = socket_strerror(socket_last_error());
     
-    socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => 1, 'usec' => 0));
+    socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => 20, 'usec' => 0));
     socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, array('sec' => 1, 'usec' => 0));
 
 
