@@ -12,7 +12,7 @@
     <string name="buttonConnect">Connect</string>
     <string name="buttonDisconnect">Disconnect</string>
     <string name="buttonSend">Send</string>
-    <string name="buttonSave">Save to server</string>
+    <string name="buttonSave">Force Upload</string>
     <string name="drunken_danger">
         음주운전시 처벌사항
         \n ▷보험료 인상과 자기부담금과 같은 민사적 책임

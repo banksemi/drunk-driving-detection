@@ -79,6 +79,8 @@ public class ConsumerActivity extends Activity implements BeaconConsumer {
     private static Handler mHandler;
     private static Map<String, JSONObject> setting = new HashMap<>();
     private BeaconManager beaconManager;
+
+    private static Date drinking_detected = null;
     public static void setValuesToView(final String title, final String contents, final int index) {
 
         mHandler.post(new Runnable() {
@@ -365,7 +367,23 @@ public class ConsumerActivity extends Activity implements BeaconConsumer {
                     StringBuffer response = new StringBuffer();
                     while ((inputLine = in.readLine()) != null) { response.append(inputLine); }
 
-                    setValuesToView("마지막 서버 갱신 결과", new Date().toString() + "\n" + response.toString(), 777);
+                    JSONObject result = new JSONObject(response.toString());
+                    String detected = "잠시 후 다시 시도해주세요.";
+                    if (result.has("result")) {
+                        if (result.getString("result") == "drink") {
+                            detected = "음주 감지";
+                            drinking_detected = new Date();
+                        }
+                        else if (result.getString("result") == "workout")
+                            detected = "운동중";
+                        else if (result.getString("result") == "nothing")
+                            detected = "일상 생활";
+                        else
+                            detected = "아직 알 수 없음";
+                    }
+
+
+                    setValuesToView("마지막 서버 갱신 결과", new Date().toString() + "\n현재 상태: " + detected, 777);
                     in.close();
                     dos.flush();
                     dos.close();
