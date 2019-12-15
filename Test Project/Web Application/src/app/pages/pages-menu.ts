@@ -8,43 +8,23 @@ export const MENU_ITEMS: NbMenuItem[] = [
     home: true,
   },
   {
-    title: 'IOT 서비스',
+    title: '내 상태 보기',
+    icon: 'clipboard-outline',
     expanded: true,
     children: [
       {
-        title: 'IOT 연동 가이드',
+        title: '가이드',
         link: '/pages/guide',
       },
       {
-        title: '내 어플리케이션',
+        title: '내 프로필',
         link: '/pages/application',
       },
     ],
   },
   {
-    title: 'FEATURES',
-    group: true,
-  },
-  {
-    title: 'Auth',
-    icon: 'lock-outline',
-    children: [
-      {
-        title: 'Login',
-        link: '/auth/login',
-      },
-      {
-        title: 'Register',
-        link: '/auth/register',
-      },
-      {
-        title: 'Request Password',
-        link: '/auth/request-password',
-      },
-      {
-        title: 'Reset Password',
-        link: '/auth/reset-password',
-      },
-    ],
+    title: 'Setting',
+    icon: "options-2-outline",
+    link: '/pages/setting'
   },
 ];

@@ -11,6 +11,7 @@ import { IotApplicationInfoComponent } from './iot-application-info/iot-applicat
 import { TemperatureDraggerComponent } from './iot-application-info/temperature-dragger/temperature-dragger.component';
 import { StatusCardComponent } from './iot-application-info/status-card/status-card.component';
 import { SettingCardComponent } from './iot-application-info/setting-card/setting-card.component';
+import { IotComponent } from './iot/iot.component';
 
 @NgModule({
   imports: [
@@ -32,7 +33,8 @@ import { SettingCardComponent } from './iot-application-info/setting-card/settin
     IotApplicationInfoComponent,
     TemperatureDraggerComponent,
     StatusCardComponent,
-    SettingCardComponent
+    SettingCardComponent,
+    IotComponent
   ],
 })
 export class PagesModule {

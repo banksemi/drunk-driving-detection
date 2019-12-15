@@ -234,12 +234,7 @@ public class ConsumerService extends SAAgent {
     }
 
     private void updateTextView(final String str) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                ConsumerActivity.updateTextView(str);
-            }
-        });
+        ConsumerActivity.setValuesToView("스마트워치 연결 정보", str, 999);
     }
 
     private void addMessage(final String prefix, final String data) {

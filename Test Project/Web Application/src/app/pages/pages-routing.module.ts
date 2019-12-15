@@ -5,6 +5,7 @@ import { PagesComponent } from './pages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { IotApplicationListComponent } from './iot-application-list/iot-application-list.component';
 import { IotApplicationInfoComponent } from './iot-application-info/iot-application-info.component';
+import { IotComponent } from './iot/iot.component';
 
 const routes: Routes = [{
   path: '',
@@ -13,6 +14,10 @@ const routes: Routes = [{
     {
       path: 'dashboard',
       component: DashboardComponent,
+    },
+    {
+      path: 'setting',
+      component: IotComponent,
     },
     {
       path: 'application',

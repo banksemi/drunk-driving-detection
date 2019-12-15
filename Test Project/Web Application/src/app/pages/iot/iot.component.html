@@ -1,0 +1,11 @@
+<nb-card status="success">
+  <nb-card-body>
+      이곳에서는 디버그에 필요한 정보를 확인할 수 있습니다.
+  </nb-card-body>
+</nb-card>
+<div *ngIf="global != null">
+  <nb-card *ngFor="let item of global" accent="info">
+    <nb-card-header>{{item.title}}</nb-card-header>
+    <nb-card-body style="white-space: pre-wrap">{{item.contents}}</nb-card-body>
+  </nb-card>
+</div>

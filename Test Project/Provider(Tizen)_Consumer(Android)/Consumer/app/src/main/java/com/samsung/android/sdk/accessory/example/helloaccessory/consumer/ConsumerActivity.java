@@ -42,6 +42,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -51,17 +52,20 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class ConsumerActivity extends Activity {
-    private static TextView mTextView;
+    private static WebView webView;
     private static MessageAdapter mMessageAdapter;
     private boolean mIsBound = false;
     private ListView mMessageListView;
     private ConsumerService mConsumerService = null;
-    private Handler mHandler = new Handler();
+    private static Handler mHandler;
 
     public void ToastMessage(final String text)
     {
@@ -83,7 +87,7 @@ public class ConsumerActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mTextView = (TextView) findViewById(R.id.tvStatus);
+        mHandler = new Handler();
         mMessageListView = (ListView) findViewById(R.id.lvMessage);
         mMessageAdapter = new MessageAdapter();
         mMessageListView.setAdapter(mMessageAdapter);
@@ -135,18 +139,24 @@ public class ConsumerActivity extends Activity {
                 } else {
                     sending_delay++;
                 }
+
+                setValuesToView("심박수",
+                        "안정 심박수: " + relax_heartrate + "\n"
+                                + "현재 심박수: " + now + "\n"
+                                + "다음 주기: " + (10*(need_delay + 1)) + "분 간격으로 상태 갱신\n", 888);
             }
         },60000 * 10,60000 * 10);
 
 
 
 
-        WebView webView = (WebView) findViewById(R.id.main_web);
+        webView = (WebView) findViewById(R.id.main_web);
         WebSettings webSettings = webView.getSettings();
         webSettings.setLoadsImagesAutomatically(true);
         webSettings.setAllowContentAccess(true);
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAppCacheEnabled(true);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webSettings.setDomStorageEnabled(true);
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
@@ -154,12 +164,37 @@ public class ConsumerActivity extends Activity {
         webView.loadUrl("https://gp.easylab.kr/?uuid=" + UUIDManager.GetDevicesUUID(this));
     }
 
+    private static Map<String, JSONObject> setting = new HashMap<>();
+
+    public static void setValuesToView(final String title, final String contents, final int index) {
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONObject item = new JSONObject();
+                    item.put("title", title);
+                    item.put("contents", contents);
+                    item.put("index", index);
+                    setting.put(title, item);
+
+                    JSONArray cache_json = new JSONArray(setting.values().toString());
+                    String script = "javascript:sendGlobalMessage(" + cache_json.toString() + ")";
+
+
+                    webView.loadUrl(script);
+                } catch (Exception e) {
+                    Log.e("에러", e.getMessage());
+                }
+            }
+        });
+    }
     @Override
     protected void onDestroy() {
         // Clean up connections
         if (mIsBound == true && mConsumerService != null) {
             if (mConsumerService.closeConnection() == false) {
-                updateTextView("Disconnected");
+                //updateTextView("Disconnected");
                 mMessageAdapter.clear();
             }
         }
@@ -182,7 +217,7 @@ public class ConsumerActivity extends Activity {
             case R.id.buttonDisconnect: {
                 if (mIsBound == true && mConsumerService != null) {
                     if (mConsumerService.closeConnection() == false) {
-                        updateTextView("Disconnected");
+                        // updateTextView("Disconnected");
                         Toast.makeText(getApplicationContext(), R.string.ConnectionAlreadyDisconnected, Toast.LENGTH_LONG).show();
                         mMessageAdapter.clear();
                     }
@@ -212,7 +247,6 @@ public class ConsumerActivity extends Activity {
             public void run() {
                 super.run();
                 try {
-                    ToastMessage("서버 업로드 준비");
                     String boundary = "*****";
                     String lineEnd = "\r\n";
                     String twoHyphens = "--";
@@ -247,8 +281,8 @@ public class ConsumerActivity extends Activity {
                     String inputLine;
                     StringBuffer response = new StringBuffer();
                     while ((inputLine = in.readLine()) != null) { response.append(inputLine); }
-                    ToastMessage("결과" + response.toString());
-                    Log.d("결과", response.toString());
+
+                    setValuesToView("마지막 서버 갱신 결과", new Date().toString() + "\n" + response.toString(), 777);
                     in.close();
                     dos.flush();
                     dos.close();
@@ -263,7 +297,7 @@ public class ConsumerActivity extends Activity {
         }.start();
     }
     private String CSVFormating() {
-        ToastMessage("CSV 포맷 변환중");
+        // setValuesToView("데이터 자동 세이브(로컬)",new Date().toString());
         final StringBuilder sb = new StringBuilder("timestamp, heartRate, gyroscopeX, gyroscopeY, gyroscopeZ, gyroscopeRotationX, gyroscopeRotationY, gyroscopeRotationZ, light\n");
         // JSONObject json:ConsumerService.SensorData
 
@@ -293,23 +327,22 @@ public class ConsumerActivity extends Activity {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             mConsumerService = ((ConsumerService.LocalBinder) service).getService();
-            updateTextView("onServiceConnected");
         }
 
         @Override
         public void onServiceDisconnected(ComponentName className) {
             mConsumerService = null;
             mIsBound = false;
-            updateTextView("onServiceDisconnected");
         }
     };
 
     public static void addMessage(String data) {
-        mMessageAdapter.addMessage(new Message(ConsumerService.SensorData.size() + "개 수신\n" + data));
-    }
+        //mMessageAdapter.addMessage(new Message(ConsumerService.SensorData.size() + "개 수신\n" + data));
 
-    public static void updateTextView(final String str) {
-        mTextView.setText(str);
+        ConsumerActivity.setValuesToView("데이터 수집 현황",
+                "RAM에 저장되있는 데이터: " + ConsumerService.SensorData.size() + "\n\n"
+                        + "마지막 데이터: \n"
+                        + data, 0);
     }
 
     private class MessageAdapter extends BaseAdapter {
