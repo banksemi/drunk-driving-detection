@@ -33,6 +33,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,7 @@ import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -231,6 +233,24 @@ public class ConsumerActivity extends Activity implements BeaconConsumer {
                         temp += " | ";
                         temp += beacon.getRssi();
                         temp += "\n";
+
+                        if (beacon.getRssi() > -58 && drinking_detected != null) {
+                            float time = new Date().getTime() - drinking_detected.getTime();
+                            time /= 1000;
+                            if (time < 60) {
+                                ToastMessage("음주 운전 감지!");
+                                final LinearLayout view = (LinearLayout) findViewById(R.id.warning);
+                                view.setVisibility(View.VISIBLE);
+                                final Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+                                vibrator.vibrate(200);
+                                mHandler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        view.setVisibility(View.INVISIBLE);
+                                    }
+                                },5000);
+                            }
+                        }
                     }
                     setValuesToView("비콘", temp, -1);
             }
@@ -370,13 +390,14 @@ public class ConsumerActivity extends Activity implements BeaconConsumer {
                     JSONObject result = new JSONObject(response.toString());
                     String detected = "잠시 후 다시 시도해주세요.";
                     if (result.has("result")) {
-                        if (result.getString("result") == "drink") {
+                        if (result.getString("result").equals("drink")) {
+                            ToastMessage("음주 상태를 감지하였습니다.");
                             detected = "음주 감지";
                             drinking_detected = new Date();
                         }
-                        else if (result.getString("result") == "workout")
+                        else if (result.getString("result").equals("workout"))
                             detected = "운동중";
-                        else if (result.getString("result") == "nothing")
+                        else if (result.getString("result").equals("nothing"))
                             detected = "일상 생활";
                         else
                             detected = "아직 알 수 없음";
