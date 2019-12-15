@@ -77,7 +77,7 @@ public class ConsumerActivity extends Activity {
             }
         });
     }
-    public int relax_heartrate = 0;
+    public int relax_heartrate = 999;
     public int sending_delay = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +112,7 @@ public class ConsumerActivity extends Activity {
             public void run() {
                 int now = 0;
                 int count = 0;
-                for(int i = ConsumerService.SensorData.size() - 1; i >= 0 && i >= ConsumerService.SensorData.size() - 300; i++) {
+                for(int i = ConsumerService.SensorData.size() - 1; i >= 0 && i >= ConsumerService.SensorData.size() - 300; i--) {
                     try {
                         int rate = ConsumerService.SensorData.get(i).getInt("heartRate");
                         if (rate > 10) {
@@ -124,9 +124,9 @@ public class ConsumerActivity extends Activity {
                 if (count != 0)
                     now /= count;
 
-                if (relax_heartrate > now) relax_heartrate = now;
+                if (count > 0 && relax_heartrate > now) relax_heartrate = now;
 
-                int need_delay = 5 - (relax_heartrate - now) / 10;
+                int need_delay = 5 + (relax_heartrate - now) / 10;
                 if (need_delay < 0) need_delay = 0;
 
                 if (sending_delay < need_delay) {
