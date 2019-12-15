@@ -102,8 +102,6 @@ def Preprocessing(X):
     
 def HeartRate(data, graph=False):
     temp = data.copy()
-    if (len(temp) == 0):
-        return [None, temp]
 
     # Remove duplicated data in hreat rate or null data
     index_list = []
@@ -117,6 +115,9 @@ def HeartRate(data, graph=False):
     temp = temp.loc[index_list]
 
     
+    if (len(temp) == 0):
+        return [None, temp]
+
     # Find Linear Curve
     X = np.array(temp["time"]).reshape(-1, 1)
     Y = np.array(temp["heartRate"]).reshape(-1, 1)
