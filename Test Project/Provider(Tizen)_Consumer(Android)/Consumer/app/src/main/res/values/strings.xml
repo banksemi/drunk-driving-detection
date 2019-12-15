@@ -13,5 +13,10 @@
     <string name="buttonDisconnect">Disconnect</string>
     <string name="buttonSend">Send</string>
     <string name="buttonSave">Save to server</string>
-
+    <string name="drunken_danger">
+        음주운전시 처벌사항
+        \n ▷보험료 인상과 자기부담금과 같은 민사적 책임
+        \n ▷3년 이하의 징역 또는 1000만 원 이하의 벌금과 같은 형사적 책임
+        \n ▷운전면허 정지나 취소
+    </string>
 </resources>
