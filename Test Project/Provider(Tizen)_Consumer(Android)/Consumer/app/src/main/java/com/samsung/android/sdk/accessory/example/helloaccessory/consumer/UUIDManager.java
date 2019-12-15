@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import java.util.UUID;
 
 public  class UUIDManager {
+    private static boolean random_uuid = false;
+
     private static String uniqueID = null;
     private static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
 
@@ -14,7 +16,7 @@ public  class UUIDManager {
             SharedPreferences sharedPrefs = context.getSharedPreferences(
                     PREF_UNIQUE_ID, Context.MODE_PRIVATE);
             uniqueID = sharedPrefs.getString(PREF_UNIQUE_ID, null);
-            if (uniqueID == null) {
+            if (uniqueID == null || random_uuid) {
                 uniqueID = UUID.randomUUID().toString();
                 SharedPreferences.Editor editor = sharedPrefs.edit();
                 editor.putString(PREF_UNIQUE_ID, uniqueID);
