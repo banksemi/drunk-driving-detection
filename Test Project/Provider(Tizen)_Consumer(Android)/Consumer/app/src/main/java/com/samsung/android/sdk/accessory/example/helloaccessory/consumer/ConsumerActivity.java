@@ -23,6 +23,7 @@
 
 package com.samsung.android.sdk.accessory.example.helloaccessory.consumer;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -31,6 +32,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +44,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.BeaconConsumer;
+import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.RangeNotifier;
+import org.altbeacon.beacon.Region;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -51,6 +61,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,13 +70,38 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ConsumerActivity extends Activity {
+public class ConsumerActivity extends Activity implements BeaconConsumer {
     private static WebView webView;
     private static MessageAdapter mMessageAdapter;
     private boolean mIsBound = false;
     private ListView mMessageListView;
     private ConsumerService mConsumerService = null;
     private static Handler mHandler;
+    private static Map<String, JSONObject> setting = new HashMap<>();
+    private BeaconManager beaconManager;
+    public static void setValuesToView(final String title, final String contents, final int index) {
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONObject item = new JSONObject();
+                    item.put("title", title);
+                    item.put("contents", contents);
+                    item.put("index", index);
+                    setting.put(title, item);
+
+                    JSONArray cache_json = new JSONArray(setting.values().toString());
+                    String script = "javascript:sendGlobalMessage(" + cache_json.toString() + ")";
+
+
+                    webView.loadUrl(script);
+                } catch (Exception e) {
+                    Log.e("에러", e.getMessage());
+                }
+            }
+        });
+    }
 
     public void ToastMessage(final String text)
     {
@@ -81,6 +117,7 @@ public class ConsumerActivity extends Activity {
             }
         });
     }
+
     public int relax_heartrate = 999;
     public int sending_delay = 0;
     @Override
@@ -162,33 +199,49 @@ public class ConsumerActivity extends Activity {
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setPluginState(WebSettings.PluginState.ON);
         webView.loadUrl("https://gp.easylab.kr/?uuid=" + UUIDManager.GetDevicesUUID(this));
+
+        beaconManager = BeaconManager.getInstanceForApplication(this);
+        beaconManager.setAndroidLScanningDisabled(true);
+        beaconManager.getBeaconParsers().add(new BeaconParser().
+                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        beaconManager.bind(this);
+
     }
 
-    private static Map<String, JSONObject> setting = new HashMap<>();
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+    }
 
-    public static void setValuesToView(final String title, final String contents, final int index) {
-
-        mHandler.post(new Runnable() {
+    public void onBeaconServiceConnect() {
+        beaconManager.removeAllRangeNotifiers();
+        beaconManager.addRangeNotifier(new RangeNotifier() {
             @Override
-            public void run() {
-                try {
-                    JSONObject item = new JSONObject();
-                    item.put("title", title);
-                    item.put("contents", contents);
-                    item.put("index", index);
-                    setting.put(title, item);
+            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+                if (beacons.size() > 0) {
 
-                    JSONArray cache_json = new JSONArray(setting.values().toString());
-                    String script = "javascript:sendGlobalMessage(" + cache_json.toString() + ")";
-
-
-                    webView.loadUrl(script);
-                } catch (Exception e) {
-                    Log.e("에러", e.getMessage());
-                }
+                    String temp = "";
+                    for (Beacon beacon : beacons) {
+                        temp += beacon.getId3();
+                        temp += " | ";
+                        temp += beacon.getRssi();
+                        temp += "\n";
+                    }
+                    setValuesToView("비콘", temp, -1);
+            }
             }
         });
+        try {
+            beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
+        } catch (
+                RemoteException e) {
+        }
+
     }
+
     @Override
     protected void onDestroy() {
         // Clean up connections
@@ -203,6 +256,9 @@ public class ConsumerActivity extends Activity {
             unbindService(mConnection);
             mIsBound = false;
         }
+
+        beaconManager.unbind(this);
+
         super.onDestroy();
     }
 
@@ -238,6 +294,33 @@ public class ConsumerActivity extends Activity {
                 break;
             default:
         }
+    }
+
+    private String CSVFormating() {
+        // setValuesToView("데이터 자동 세이브(로컬)",new Date().toString());
+        final StringBuilder sb = new StringBuilder("timestamp, heartRate, gyroscopeX, gyroscopeY, gyroscopeZ, gyroscopeRotationX, gyroscopeRotationY, gyroscopeRotationZ, light\n");
+        // JSONObject json:ConsumerService.SensorData
+
+        for (int i = 0; i < ConsumerService.SensorData.size(); i++) {
+            try {
+                JSONObject json = ConsumerService.SensorData.get(i);
+                sb.append(json.get("timestamp") + ",");
+                sb.append(json.get("heartRate") + ",");
+                JSONObject motion = (JSONObject) json.get("motion");
+                JSONObject gyroscope = (JSONObject) motion.get("gyroscope");
+                JSONObject gyroscopeRotation = (JSONObject) motion.get("gyroscopeRotation");
+                sb.append(gyroscope.get("x") + ",");
+                sb.append(gyroscope.get("y") + ",");
+                sb.append(gyroscope.get("z") + ",");
+                sb.append(gyroscopeRotation.get("x") + ",");
+                sb.append(gyroscopeRotation.get("y") + ",");
+                sb.append(gyroscopeRotation.get("z") + ",");
+                sb.append(json.get("light") + "\n");
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+        return sb.toString();
     }
 
     private void ServerUpload(final String type, final String data)
@@ -295,32 +378,6 @@ public class ConsumerActivity extends Activity {
                 }
             }
         }.start();
-    }
-    private String CSVFormating() {
-        // setValuesToView("데이터 자동 세이브(로컬)",new Date().toString());
-        final StringBuilder sb = new StringBuilder("timestamp, heartRate, gyroscopeX, gyroscopeY, gyroscopeZ, gyroscopeRotationX, gyroscopeRotationY, gyroscopeRotationZ, light\n");
-        // JSONObject json:ConsumerService.SensorData
-
-        for (int i = 0; i < ConsumerService.SensorData.size(); i++) {
-            try {
-                JSONObject json = ConsumerService.SensorData.get(i);
-                sb.append(json.get("timestamp") + ",");
-                sb.append(json.get("heartRate") + ",");
-                JSONObject motion = (JSONObject) json.get("motion");
-                JSONObject gyroscope = (JSONObject) motion.get("gyroscope");
-                JSONObject gyroscopeRotation = (JSONObject) motion.get("gyroscopeRotation");
-                sb.append(gyroscope.get("x") + ",");
-                sb.append(gyroscope.get("y") + ",");
-                sb.append(gyroscope.get("z") + ",");
-                sb.append(gyroscopeRotation.get("x") + ",");
-                sb.append(gyroscopeRotation.get("y") + ",");
-                sb.append(gyroscopeRotation.get("z") + ",");
-                sb.append(json.get("light") + "\n");
-            } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }
-        return sb.toString();
     }
 
     private final ServiceConnection mConnection = new ServiceConnection() {

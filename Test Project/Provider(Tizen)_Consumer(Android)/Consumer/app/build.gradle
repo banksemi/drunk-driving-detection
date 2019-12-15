@@ -21,7 +21,9 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     implementation "androidx.constraintlayout:constraintlayout:2.0.0-beta1"
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'org.altbeacon:android-beacon-library:2+'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
 }
