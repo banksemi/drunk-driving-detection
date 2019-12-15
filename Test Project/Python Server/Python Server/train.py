@@ -102,8 +102,9 @@ def Preprocessing(X):
     
 def HeartRate(data, graph=False):
     temp = data.copy()
-    
-    
+    if (len(temp) == 0):
+        return [None, temp]
+
     # Remove duplicated data in hreat rate or null data
     index_list = []
     last = 0
@@ -208,6 +209,8 @@ def train():
     cv_scores = cross_val_score(model, X_min_max_scaled, Y, cv=5)
     print(Y.value_counts())
     print("Model Score:", cv_scores.mean())
+
+
 
 def predict(data):
     global min_max_scaler, model
