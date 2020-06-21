@@ -2,7 +2,7 @@
 
 Drunk driving is actually one of the most problematic factors in driving. To prevent such drunk driving, we propose our system. This system can be used with a smart watch or smart phone. Drinking is detected by machine learning.
 
-### Process 
+### Main Process 
 
 1. We recognize biometric data through smart watches.
 
@@ -40,7 +40,9 @@ These instructions will get you a copy of the project up and running on your loc
         - MariaDB 10
 
 ### Installing & Deployment
-Detailed installation and environment information can be found [here](https://github.com/banksemi/drunk-driving-detection/wiki/Installation).
+- Detailed installation and environment information can be found [here](https://github.com/banksemi/drunk-driving-detection/wiki/Installation).
+
+- If you want to understand the project structure, please refer to [this page](https://github.com/banksemi/drunk-driving-detection/wiki/Project-Structure).
 
 ## Built With
 
