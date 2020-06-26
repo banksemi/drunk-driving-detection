@@ -14,7 +14,7 @@
 
     $resultMessage->error = null;
 
-    $address = "192.168.1.49"; // 접속할 IP //
+    $address = Setting::$PythonServerIP; // 접속할 IP //
     $port = 4000; // 접속할 PORT //
     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP); // TCP 통신용 소켓 생성 //
    
