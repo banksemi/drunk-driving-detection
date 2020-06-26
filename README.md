@@ -87,4 +87,5 @@ See also the list of [contributors](https://github.com/banksemi/drunk-driving-de
 <ul>
 <li><a href="https://github.com/banksemi/drunk-driving-detection/wiki/API-List">1. Web API</a></li>
 <li><a href="https://github.com/banksemi/drunk-driving-detection/wiki/New-API-Development">2. New API Development</a></li>
+<li><a href="https://github.com/banksemi/drunk-driving-detection/wiki/Drinking-Prediction-Model">3. Drinking Prediction Model</a></li>
 </ul>
